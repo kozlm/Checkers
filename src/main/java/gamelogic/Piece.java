@@ -32,5 +32,6 @@ public abstract class Piece {
         this.colour = colour;
     }
 
+    public abstract Piece clonePiece();
 
 }

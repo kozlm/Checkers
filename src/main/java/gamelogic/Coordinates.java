@@ -1,11 +1,12 @@
 package gamelogic;
 
 public class Coordinates {
-    public Coordinates(int x, int y){
+    public Coordinates(int x, int y) {
         this.x = x;
         this.y = y;
     }
-    int x,y;
+
+    private int x, y;
 
     public int getX() {
         return x;
@@ -23,6 +24,10 @@ public class Coordinates {
         this.y = y;
     }
 
-
-
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Coordinates) {
+            return (((Coordinates) obj).getX() == x && ((Coordinates) obj).getY() == y);
+        } else return super.equals(obj);
+    }
 }

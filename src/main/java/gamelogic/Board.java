@@ -1,7 +1,9 @@
 package gamelogic;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.util.Pair;
+
+import java.security.Key;
+import java.util.*;
 
 public class Board {
 
@@ -12,9 +14,12 @@ public class Board {
         initializeBoard();
     }
 
-    //private boolean isPositionOccupied(int x, int y) {
-    //    return gameboard[x][y] != null;
-    //}
+    public Board(boolean emptyIndicator) {
+        gameboard = new Piece[10][10];
+        blackPieces = new ArrayList<>();
+        whitePieces = new ArrayList<>();
+        if (!emptyIndicator) initializeBoard();
+    }
 
     private void initializeBoard() {
         for (int i = 0; i < 4; i++) {
@@ -40,24 +45,80 @@ public class Board {
         }
     }
 
+
     private Piece[][] gameboard;
     private List<Piece> whitePieces;
     private List<Piece> blackPieces;
 
+    public void movePiece(Piece piece, int xDestination, int yDestination) {
+        int xCurrent = piece.getCords().getX();
+        int yCurrent = piece.getCords().getY();
+        Piece capturedPiece = null;
+        if (piece instanceof Man) {
+            if (Math.abs(xDestination - xCurrent) == 2) {
+                capturedPiece = gameboard[xCurrent + (xDestination - xCurrent) / 2][yCurrent + (yDestination - yCurrent) / 2];
+                gameboard[xCurrent + (xDestination - xCurrent) / 2][yCurrent + (yDestination - yCurrent) / 2] = null;
+            }
+        } else {
+            int xIncrement = (xDestination - xCurrent) / Math.abs(xDestination - xCurrent);
+            int yIncrement = (yDestination - yCurrent) / Math.abs(yDestination - yCurrent);
+            int x = xCurrent + xIncrement;
+            int y = yCurrent + yIncrement;
+            while (x != xDestination && y != yDestination) {
+                if (gameboard[x][y] != null) {
+                    capturedPiece = gameboard[x][y];
+                    gameboard[x][y] = null;
+                    break;
+                }
+                x += xIncrement;
+                y += yIncrement;
+            }
+        }
+        if (capturedPiece != null) {
+            whitePieces.remove(capturedPiece);
+            blackPieces.remove(capturedPiece);
+        }
+        piece.move(xDestination, yDestination);
+        gameboard[xDestination][yDestination] = piece;
+    }
 
-    public List<Piece> getAvailableCaptures(Colour colour) {
-        List<Piece> availableCaptures = new ArrayList<>();
+    public List<Coordinates> getAllPossibleMoves(Piece piece) {
+        if (isCaptureAvailable(piece)) return verifyCaptures(piece,getAvailableCaptures(piece));
+        else if (isCaptureAvailable(piece.getColour())) return null;
+        else return getAvailableRegularMoves(piece);
+    }
+
+    public List<Coordinates> getAvailableRegularMoves(Piece piece) {
+        if (piece instanceof King) return getKingsMoves((King) piece);
+        else {
+            List<Coordinates> regularMovesList = new ArrayList<>();
+            int direction = piece.getColour() == Colour.WHITE ? 1 : -1;
+            int x = piece.getCords().getX();
+            int y = piece.getCords().getY();
+            if (gameboard[x + 1][y + direction] == null) regularMovesList.add(new Coordinates(x + 1, y + direction));
+            if (gameboard[x - 1][y + direction] == null) regularMovesList.add(new Coordinates(x - 1, y + direction));
+            return regularMovesList;
+        }
+    }
+
+
+    public List<Coordinates> getAvailableCaptures(Piece piece) {
+        if (piece instanceof King) return getKingsMoves((King) piece);
+        else return getMansCaptures((Man) piece);
+    }
+
+    public boolean isCaptureAvailable(Colour colour) {
         if (colour == Colour.WHITE) {
             for (Piece piece : whitePieces) {
-                if (isCaptureAvailable(piece)) availableCaptures.add(piece);
+                if (isCaptureAvailable(piece)) return true;
             }
         }
         if (colour == Colour.BLACK) {
             for (Piece piece : blackPieces) {
-                if (isCaptureAvailable(piece)) availableCaptures.add(piece);
+                if (isCaptureAvailable(piece)) return true;
             }
         }
-        return availableCaptures;
+        return false;
     }
 
     public boolean isCaptureAvailable(Piece piece) {
@@ -91,33 +152,32 @@ public class Board {
         return false;
     }
 
-    private List<Coordinates> getKingsCaptures(King king) {
+    private List<Coordinates> getKingsMoves(King king) {
         List<Coordinates> possibleCapturesList = new ArrayList<>();
-        possibleCapturesList.addAll(getKingsCapturesOnDiagonal(king, 1, 1));
-        possibleCapturesList.addAll(getKingsCapturesOnDiagonal(king, -1, -1));
-        possibleCapturesList.addAll(getKingsCapturesOnDiagonal(king, -1, 1));
-        possibleCapturesList.addAll(getKingsCapturesOnDiagonal(king, 1, -1));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, 1));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, -1));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, 1));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, -1));
         return possibleCapturesList;
     }
 
-    private List<Coordinates> getKingsCapturesOnDiagonal(King king, int xIncrement, int yIncrement) {
+    private List<Coordinates> getKingsMovesOnDiagonal(King king, int xIncrement, int yIncrement) {
         int x = king.getCords().getX() + xIncrement;
         int y = king.getCords().getY() + yIncrement;
         Colour colour = king.getColour();
-        List<Coordinates> possibleCapturesList = new ArrayList<>();
-        boolean isEnemyPieceOnDiagonal = false;
-
+        List<Coordinates> possibleMovesList = new ArrayList<>();
         while (x >= 0 && x < 10 && y >= 0 && y < 10) {
             if (gameboard[x][y] != null && gameboard[x][y].getColour() == colour)
                 break;
-            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour)
-                isEnemyPieceOnDiagonal = true;
-            if (gameboard[x][y] == null && isEnemyPieceOnDiagonal)
-                possibleCapturesList.add(new Coordinates(x, y));
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour) {
+                possibleMovesList.clear();
+            }
+            if (gameboard[x][y] == null)
+                possibleMovesList.add(new Coordinates(x, y));
             x += xIncrement;
             y += yIncrement;
         }
-        return possibleCapturesList;
+        return possibleMovesList;
     }
 
     private boolean isMansCaptureAvailable(Man man) {
@@ -176,5 +236,55 @@ public class Board {
         }
 
         return possibleCapturesList;
+    }
+
+    private List<Coordinates> verifyCaptures(Piece piece, List<Coordinates> allCaptures) {
+        List<Coordinates> verifiedCaptures = new ArrayList<>();
+        PriorityQueue<Pair<Integer, Coordinates>> valuedCaptures = new PriorityQueue<>();
+        for (Coordinates capture : allCaptures) {
+            Board clonedBoard = cloneBoard();
+            Piece clonedPiece = clonedBoard.gameboard[piece.getCords().getX()][piece.getCords().getY()];
+            valuedCaptures.add(new Pair<>(valueCapture(clonedBoard, clonedPiece, capture), capture));
+        }
+        if (valuedCaptures.isEmpty()) return null;
+        int highestValue = valuedCaptures.peek().getKey();
+        for (Pair<Integer,Coordinates> pair:valuedCaptures){
+            if (pair.getKey()==highestValue) verifiedCaptures.add(pair.getValue());
+            else break;
+        }
+        return verifiedCaptures;
+    }
+
+    private int valueCapture(Board board, Piece piece, Coordinates capture) {
+        board.movePiece(piece, capture.getX(), capture.getY());
+        if (!isCaptureAvailable(piece)) return 1;
+
+        else {
+            List<Coordinates> capturesList = board.getAvailableCaptures(piece);
+            int maxValue = 0;
+            for (Coordinates captureFromList : capturesList) {
+                Board clonedBoard = cloneBoard();
+                Piece clonedPiece = clonedBoard.gameboard[piece.getCords().getX()][piece.getCords().getY()];
+                int captureFromListsValue = valueCapture(clonedBoard, clonedPiece, captureFromList) + 1;
+                if (captureFromListsValue > maxValue) maxValue = captureFromListsValue;
+            }
+            return maxValue;
+        }
+    }
+
+    private Board cloneBoard() {
+        Board clonedBoard = new Board(true);
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                if (gameboard[i][j] == null) clonedBoard.gameboard[i][j] = null;
+                else {
+                    clonedBoard.gameboard[i][j] = gameboard[i][j].clonePiece();
+                    if (clonedBoard.gameboard[i][j].getColour() == Colour.WHITE)
+                        clonedBoard.whitePieces.add(clonedBoard.gameboard[i][j]);
+                    else clonedBoard.blackPieces.add(clonedBoard.gameboard[i][j]);
+                }
+            }
+        }
+        return clonedBoard;
     }
 }
