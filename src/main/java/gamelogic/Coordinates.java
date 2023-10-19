@@ -1,6 +1,6 @@
 package gamelogic;
 
-public class Coordinates {
+public class Coordinates implements Comparable<Coordinates> {
     public Coordinates(int x, int y) {
         this.x = x;
         this.y = y;
@@ -29,5 +29,15 @@ public class Coordinates {
         if (obj instanceof Coordinates) {
             return (((Coordinates) obj).getX() == x && ((Coordinates) obj).getY() == y);
         } else return super.equals(obj);
+    }
+
+    @Override
+    public String toString() {
+        return x + "x" + y;
+    }
+
+    @Override
+    public int compareTo(Coordinates coordinates) {
+        return (x - coordinates.x) + (y - coordinates.y);
     }
 }

@@ -9,6 +9,14 @@ public class Man extends Piece{
 
     @Override
     public Piece clonePiece() {
-        return (new Man(getColour(),new Coordinates(getCords().getX(), getCords().getY())));
+        Man clonedMan = new Man(getColour(),new Coordinates(getCords().getX(), getCords().getY()));
+        if (isTransparent()) clonedMan.setTransparent(true);
+        return clonedMan;
+    }
+
+    @Override
+    public String toString() {
+        if (getColour()==Colour.WHITE) return "whiteMan";
+        else return "blackMan";
     }
 }

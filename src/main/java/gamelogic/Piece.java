@@ -4,9 +4,20 @@ public abstract class Piece {
     public Piece(Colour colour, Coordinates cords) {
         this.colour = colour;
         this.cords = cords;
+        isTransparent = false;
     }
 
     private Colour colour;
+
+    public boolean isTransparent() {
+        return isTransparent;
+    }
+
+    public void setTransparent(boolean transparent) {
+        isTransparent = transparent;
+    }
+
+    private boolean isTransparent;
 
 
     public Coordinates getCords() {

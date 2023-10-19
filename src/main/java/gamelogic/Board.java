@@ -1,7 +1,5 @@
 package gamelogic;
 
-import javafx.util.Pair;
-
 import java.security.Key;
 import java.util.*;
 
@@ -46,18 +44,36 @@ public class Board {
     }
 
 
+    public Piece[][] getGameboard() {
+        return gameboard;
+    }
+
+    public List<Piece> getWhitePieces() {
+        return whitePieces;
+    }
+
+    public List<Piece> getBlackPieces() {
+        return blackPieces;
+    }
+
     private Piece[][] gameboard;
     private List<Piece> whitePieces;
     private List<Piece> blackPieces;
 
-    public void movePiece(Piece piece, int xDestination, int yDestination) {
+    public boolean movePiece(Piece piece, int xDestination, int yDestination,boolean shouldRemoveTransparent) {
         int xCurrent = piece.getCords().getX();
         int yCurrent = piece.getCords().getY();
         Piece capturedPiece = null;
+        if (xDestination > 9 || xDestination < 0 || yDestination < 0 || yDestination > 9)
+            throw new IllegalArgumentException("Illegal values of destination coordinates!");
+        if (Math.abs(xDestination - xCurrent) != Math.abs(yDestination - yCurrent))
+            throw new IllegalArgumentException("Illegal move of a piece!");
         if (piece instanceof Man) {
+            if ((Math.abs(yDestination - yCurrent) != 2 && Math.abs(yDestination - yCurrent) != 1)
+                    || (Math.abs(xDestination - xCurrent) != 2 && Math.abs(xDestination - xCurrent) != 1))
+                throw new IllegalArgumentException("Illegal move of a man piece!");
             if (Math.abs(xDestination - xCurrent) == 2) {
                 capturedPiece = gameboard[xCurrent + (xDestination - xCurrent) / 2][yCurrent + (yDestination - yCurrent) / 2];
-                gameboard[xCurrent + (xDestination - xCurrent) / 2][yCurrent + (yDestination - yCurrent) / 2] = null;
             }
         } else {
             int xIncrement = (xDestination - xCurrent) / Math.abs(xDestination - xCurrent);
@@ -67,7 +83,6 @@ public class Board {
             while (x != xDestination && y != yDestination) {
                 if (gameboard[x][y] != null) {
                     capturedPiece = gameboard[x][y];
-                    gameboard[x][y] = null;
                     break;
                 }
                 x += xIncrement;
@@ -75,36 +90,45 @@ public class Board {
             }
         }
         if (capturedPiece != null) {
-            whitePieces.remove(capturedPiece);
-            blackPieces.remove(capturedPiece);
+            capturedPiece.setTransparent(true);
         }
         piece.move(xDestination, yDestination);
         gameboard[xDestination][yDestination] = piece;
-    }
-
-    public List<Coordinates> getAllPossibleMoves(Piece piece) {
-        if (isCaptureAvailable(piece)) return verifyCaptures(piece,getAvailableCaptures(piece));
-        else if (isCaptureAvailable(piece.getColour())) return null;
-        else return getAvailableRegularMoves(piece);
-    }
-
-    public List<Coordinates> getAvailableRegularMoves(Piece piece) {
-        if (piece instanceof King) return getKingsMoves((King) piece);
+        gameboard[xCurrent][yCurrent] = null;
+        if (isCaptureAvailable(piece)) return false;
         else {
-            List<Coordinates> regularMovesList = new ArrayList<>();
-            int direction = piece.getColour() == Colour.WHITE ? 1 : -1;
-            int x = piece.getCords().getX();
-            int y = piece.getCords().getY();
-            if (gameboard[x + 1][y + direction] == null) regularMovesList.add(new Coordinates(x + 1, y + direction));
-            if (gameboard[x - 1][y + direction] == null) regularMovesList.add(new Coordinates(x - 1, y + direction));
-            return regularMovesList;
+            if (shouldRemoveTransparent) {
+                Iterator<Piece> iterator;
+                if (piece.getColour() == Colour.WHITE) iterator = blackPieces.iterator();
+                else iterator = whitePieces.iterator();
+                while (iterator.hasNext()) {
+                    Piece p = iterator.next();
+                    if (p.isTransparent()) {
+                        gameboard[p.getCords().getX()][p.getCords().getY()] = null;
+                        iterator.remove();
+                    }
+                }
+            }
+            return true;
         }
+    }
+
+    public boolean movePiece(Piece piece, int xDestination, int yDestination) {
+        return movePiece(piece,xDestination,yDestination,true);
+    }
+
+    public List<Coordinates> getPossibleMoves(Piece piece) {
+        if (!isCaptureAvailable(piece) && isCaptureAvailable(piece.getColour())) return new ArrayList<>();
+        if (piece instanceof King) return verifyCaptures(piece, getKingsMoves((King) piece));
+        else return verifyCaptures(piece, getMansMoves((Man) piece));
     }
 
 
     public List<Coordinates> getAvailableCaptures(Piece piece) {
-        if (piece instanceof King) return getKingsMoves((King) piece);
-        else return getMansCaptures((Man) piece);
+        if (isCaptureAvailable(piece)) {
+            if (piece instanceof King) return getKingsMoves((King) piece);
+            else return getMansMoves((Man) piece);
+        } else return new ArrayList<>();
     }
 
     public boolean isCaptureAvailable(Colour colour) {
@@ -123,14 +147,44 @@ public class Board {
 
     public boolean isCaptureAvailable(Piece piece) {
 
-        if (piece instanceof King) return isKingsCaptureAvailable((King) piece);
-        else return isMansCaptureAvailable((Man) piece);
+        if (piece instanceof King) {
+            return (isKingsCaptureAvailableOnDiagonal((King) piece, 1, 1) || isKingsCaptureAvailableOnDiagonal((King) piece, 1, -1)
+                    || isKingsCaptureAvailableOnDiagonal((King) piece, -1, 1) || isKingsCaptureAvailableOnDiagonal((King) piece, -1, -1));
+        } else {
+            int x = piece.getCords().getX();
+            int y = piece.getCords().getY();
+            Colour colour = piece.getColour();
+            //checking possible jumps
 
-    }
+            //diagonal + +
+            if (x < 8 && y < 8 && gameboard[x + 1][y + 1] != null) {
+                if(gameboard[x + 1][y + 1].getColour() != colour && !gameboard[x + 1][y + 1].isTransparent()
+                        && gameboard[x + 2][y + 2] == null)
+                    return true;
+            }
+            //diagonal - -
+            if (x > 1 && y > 1 && gameboard[x - 1][y - 1] != null) {
+                if(gameboard[x - 1][y - 1].getColour() != colour && !gameboard[x - 1][y - 1].isTransparent()
+                        && gameboard[x - 2][y - 2] == null)
+                    return true;
+            }
+            //diagonal + -
+            if (x < 8 && y > 1 && gameboard[x + 1][y - 1] != null) {
+                if(gameboard[x + 1][y - 1].getColour() != colour && !gameboard[x + 1][y - 1].isTransparent()
+                        && gameboard[x + 2][y - 2] == null)
+                    return true;
+            }
+            //diagonal - +
+            if (x > 1 && y < 8 && gameboard[x - 1][y + 1] != null) {
+                if(gameboard[x - 1][y + 1].getColour() != colour && !gameboard[x - 1][y + 1].isTransparent()
+                        && gameboard[x - 2][y + 2] == null)
+                    return true;
+            }
 
-    private boolean isKingsCaptureAvailable(King king) {
-        return (isKingsCaptureAvailableOnDiagonal(king, 1, 1) || isKingsCaptureAvailableOnDiagonal(king, 1, -1)
-                || isKingsCaptureAvailableOnDiagonal(king, -1, 1) || isKingsCaptureAvailableOnDiagonal(king, -1, -1));
+            return false;
+
+        }
+
     }
 
     private boolean isKingsCaptureAvailableOnDiagonal(King king, int xIncrement, int yIncrement) {
@@ -141,6 +195,10 @@ public class Board {
 
         while (x >= 0 && x < 10 && y >= 0 && y < 10) {
             if (gameboard[x][y] != null && gameboard[x][y].getColour() == colour)
+                return false;
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour && isEnemyPieceOnDiagonal)
+                return false;
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour && gameboard[x][y].isTransparent())
                 return false;
             if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour)
                 isEnemyPieceOnDiagonal = true;
@@ -153,117 +211,110 @@ public class Board {
     }
 
     private List<Coordinates> getKingsMoves(King king) {
+        boolean isCaptureAvailable = false;
+        if (isCaptureAvailable(king)) isCaptureAvailable = true;
         List<Coordinates> possibleCapturesList = new ArrayList<>();
-        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, 1));
-        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, -1));
-        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, 1));
-        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, -1));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, 1, isCaptureAvailable));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, -1, isCaptureAvailable));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, 1, isCaptureAvailable));
+        possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, -1, isCaptureAvailable));
         return possibleCapturesList;
     }
 
-    private List<Coordinates> getKingsMovesOnDiagonal(King king, int xIncrement, int yIncrement) {
+    private List<Coordinates> getKingsMovesOnDiagonal(King king, int xIncrement, int yIncrement, boolean isCaptureAvailable) {
         int x = king.getCords().getX() + xIncrement;
         int y = king.getCords().getY() + yIncrement;
         Colour colour = king.getColour();
         List<Coordinates> possibleMovesList = new ArrayList<>();
+        boolean gotPiece = false;
         while (x >= 0 && x < 10 && y >= 0 && y < 10) {
-            if (gameboard[x][y] != null && gameboard[x][y].getColour() == colour)
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() == colour) break;
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour && gotPiece) break;
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour && gameboard[x][y].isTransparent())
                 break;
-            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour) {
+            if (gameboard[x][y] != null && gameboard[x][y].getColour() != colour && !gotPiece) {
                 possibleMovesList.clear();
+                gotPiece = true;
             }
             if (gameboard[x][y] == null)
                 possibleMovesList.add(new Coordinates(x, y));
             x += xIncrement;
             y += yIncrement;
         }
+        if (isCaptureAvailable && !gotPiece) possibleMovesList.clear();
         return possibleMovesList;
     }
 
-    private boolean isMansCaptureAvailable(Man man) {
+
+    private List<Coordinates> getMansMoves(Man man) {
+        List<Coordinates> movesList = new ArrayList<>();
         int x = man.getCords().getX();
         int y = man.getCords().getY();
         Colour colour = man.getColour();
-        //checking possible jumps
+        if (isCaptureAvailable(man)) {
+            //checking possible jumps
+            //diagonal + +
+            if (x < 8 && y < 8 && gameboard[x + 1][y + 1] != null) {
+                if (gameboard[x + 1][y + 1].getColour() != colour && !gameboard[x + 1][y + 1].isTransparent()
+                        && gameboard[x + 2][y + 2] == null)
+                    movesList.add(new Coordinates(x + 2, y + 2));
+            }
+            //diagonal - -
+            if (x > 1 && y > 1 && gameboard[x - 1][y - 1] != null) {
+                if (gameboard[x - 1][y - 1].getColour() != colour && !gameboard[x - 1][y - 1].isTransparent()
+                        && gameboard[x - 2][y - 2] == null)
+                    movesList.add(new Coordinates(x - 2, y - 2));
+            }
+            //diagonal + -
+            if (x < 8 && y > 1 && gameboard[x + 1][y - 1] != null) {
+                if (gameboard[x + 1][y - 1].getColour() != colour && !gameboard[x + 1][y - 1].isTransparent()
+                        && gameboard[x + 2][y - 2] == null)
+                    movesList.add(new Coordinates(x + 2, y - 2));
+            }
+            //diagonal - +
+            if (x > 1 && y < 8 && gameboard[x - 1][y + 1] != null) {
+                if (gameboard[x - 1][y + 1].getColour() != colour && !gameboard[x - 1][y + 1].isTransparent()
+                        && gameboard[x - 2][y + 2] == null)
+                    movesList.add(new Coordinates(x - 2, y + 2));
+            }
 
-        //diagonal + +
-        if (x < 8 && y < 8 && gameboard[x + 1][y + 1] != null) {
-            return gameboard[x + 1][y + 1].getColour() != colour && gameboard[x + 2][y + 2] == null;
-        }
-        //diagonal - -
-        if (x > 1 && y > 1 && gameboard[x - 1][y - 1] != null) {
-            return gameboard[x - 1][y - 1].getColour() != colour && gameboard[x - 2][y - 2] == null;
-        }
-        //diagonal + -
-        if (x < 8 && y > 1 && gameboard[x + 1][y - 1] != null) {
-            return gameboard[x + 1][y - 1].getColour() != colour && gameboard[x + 2][y - 2] == null;
-        }
-        //diagonal - +
-        if (x > 1 && y < 8 && gameboard[x - 1][y + 1] != null) {
-            return gameboard[x - 1][y + 1].getColour() != colour && gameboard[x - 2][y + 2] == null;
-        }
+        } else {
+            int direction = man.getColour() == Colour.WHITE ? 1 : -1;
+            if (gameboard[x + 1][y + direction] == null)
+                movesList.add(new Coordinates(x + 1, y + direction));
+            if (gameboard[x - 1][y + direction] == null)
+                movesList.add(new Coordinates(x - 1, y + direction));
 
-        return false;
-    }
-
-
-    private List<Coordinates> getMansCaptures(Man man) {
-        int x = man.getCords().getX();
-        int y = man.getCords().getY();
-        Colour colour = man.getColour();
-        List<Coordinates> possibleCapturesList = new ArrayList<>();
-        //checking possible jumps
-
-        //diagonal + +
-        if (x < 8 && y < 8 && gameboard[x + 1][y + 1] != null) {
-            if (gameboard[x + 1][y + 1].getColour() != colour && gameboard[x + 2][y + 2] == null)
-                possibleCapturesList.add(new Coordinates(x + 2, y + 2));
         }
-        //diagonal - -
-        if (x > 1 && y > 1 && gameboard[x - 1][y - 1] != null) {
-            if (gameboard[x - 1][y - 1].getColour() != colour && gameboard[x - 2][y - 2] == null)
-                possibleCapturesList.add(new Coordinates(x - 2, y - 2));
-        }
-        //diagonal + -
-        if (x < 8 && y > 1 && gameboard[x + 1][y - 1] != null) {
-            if (gameboard[x + 1][y - 1].getColour() != colour && gameboard[x + 2][y - 2] == null)
-                possibleCapturesList.add(new Coordinates(x + 2, y - 2));
-        }
-        //diagonal - +
-        if (x > 1 && y < 8 && gameboard[x - 1][y + 1] != null) {
-            if (gameboard[x - 1][y + 1].getColour() != colour && gameboard[x - 2][y + 2] == null)
-                possibleCapturesList.add(new Coordinates(x - 2, y + 2));
-        }
-
-        return possibleCapturesList;
+        return movesList;
     }
 
     private List<Coordinates> verifyCaptures(Piece piece, List<Coordinates> allCaptures) {
         List<Coordinates> verifiedCaptures = new ArrayList<>();
-        PriorityQueue<Pair<Integer, Coordinates>> valuedCaptures = new PriorityQueue<>();
+        PriorityQueue<gamelogic.Pair<Integer, Coordinates>> valuedCaptures = new PriorityQueue<>(Collections.reverseOrder());
         for (Coordinates capture : allCaptures) {
             Board clonedBoard = cloneBoard();
             Piece clonedPiece = clonedBoard.gameboard[piece.getCords().getX()][piece.getCords().getY()];
-            valuedCaptures.add(new Pair<>(valueCapture(clonedBoard, clonedPiece, capture), capture));
+            valuedCaptures.add(new gamelogic.Pair<>(valueCapture(clonedBoard, clonedPiece, capture), capture));
         }
         if (valuedCaptures.isEmpty()) return null;
         int highestValue = valuedCaptures.peek().getKey();
-        for (Pair<Integer,Coordinates> pair:valuedCaptures){
-            if (pair.getKey()==highestValue) verifiedCaptures.add(pair.getValue());
+        for (gamelogic.Pair<Integer, Coordinates> pair : valuedCaptures) {
+            if (pair.getKey() == highestValue) verifiedCaptures.add(pair.getValue());
             else break;
         }
         return verifiedCaptures;
     }
 
     private int valueCapture(Board board, Piece piece, Coordinates capture) {
-        board.movePiece(piece, capture.getX(), capture.getY());
-        if (!isCaptureAvailable(piece)) return 1;
+        board.movePiece(piece, capture.getX(), capture.getY(),false);
+        if (!board.isCaptureAvailable(piece)) return 1;
 
         else {
             List<Coordinates> capturesList = board.getAvailableCaptures(piece);
             int maxValue = 0;
             for (Coordinates captureFromList : capturesList) {
-                Board clonedBoard = cloneBoard();
+                Board clonedBoard = board.cloneBoard();
                 Piece clonedPiece = clonedBoard.gameboard[piece.getCords().getX()][piece.getCords().getY()];
                 int captureFromListsValue = valueCapture(clonedBoard, clonedPiece, captureFromList) + 1;
                 if (captureFromListsValue > maxValue) maxValue = captureFromListsValue;
