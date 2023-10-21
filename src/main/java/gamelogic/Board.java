@@ -60,7 +60,7 @@ public class Board {
     private List<Piece> whitePieces;
     private List<Piece> blackPieces;
 
-    public boolean movePiece(Piece piece, int xDestination, int yDestination,boolean shouldRemoveTransparent) {
+    public boolean movePiece(Piece piece, int xDestination, int yDestination, boolean shouldRemoveTransparent) {
         int xCurrent = piece.getCords().getX();
         int yCurrent = piece.getCords().getY();
         Piece capturedPiece = null;
@@ -95,8 +95,9 @@ public class Board {
         piece.move(xDestination, yDestination);
         gameboard[xDestination][yDestination] = piece;
         gameboard[xCurrent][yCurrent] = null;
-        if (isCaptureAvailable(piece)) return false;
-        else {
+        if (capturedPiece != null && isCaptureAvailable(piece)) {
+            return false;
+        } else {
             if (shouldRemoveTransparent) {
                 Iterator<Piece> iterator;
                 if (piece.getColour() == Colour.WHITE) iterator = blackPieces.iterator();
@@ -109,18 +110,38 @@ public class Board {
                     }
                 }
             }
+            promotePieces(piece.getColour());
             return true;
         }
     }
 
+    private void promotePieces(Colour colour) {
+        int promotionLine = colour == Colour.WHITE ? 9 : 0;
+        List<Piece> pieces = colour == Colour.WHITE ? whitePieces : blackPieces;
+        for (int i = 0; i < 10; i++) {
+            if (gameboard[i][promotionLine] != null && gameboard[i][promotionLine].getColour() == colour
+                    && gameboard[i][promotionLine] instanceof Man) {
+                pieces.remove(gameboard[i][promotionLine]);
+                King king = new King(colour, new Coordinates(i, promotionLine));
+                gameboard[i][promotionLine] = king;
+                pieces.add(king);
+            }
+        }
+    }
+
     public boolean movePiece(Piece piece, int xDestination, int yDestination) {
-        return movePiece(piece,xDestination,yDestination,true);
+        return movePiece(piece, xDestination, yDestination, true);
     }
 
     public List<Coordinates> getPossibleMoves(Piece piece) {
         if (!isCaptureAvailable(piece) && isCaptureAvailable(piece.getColour())) return new ArrayList<>();
-        if (piece instanceof King) return verifyCaptures(piece, getKingsMoves((King) piece));
-        else return verifyCaptures(piece, getMansMoves((Man) piece));
+        if (piece instanceof King) {
+            if (isCaptureAvailable(piece)) return verifyCaptures(piece, getKingsMoves((King) piece));
+            else return getKingsMoves((King) piece);
+        } else {
+            if (isCaptureAvailable(piece)) return verifyCaptures(piece, getMansMoves((Man) piece));
+            else return getMansMoves((Man) piece);
+        }
     }
 
 
@@ -158,25 +179,25 @@ public class Board {
 
             //diagonal + +
             if (x < 8 && y < 8 && gameboard[x + 1][y + 1] != null) {
-                if(gameboard[x + 1][y + 1].getColour() != colour && !gameboard[x + 1][y + 1].isTransparent()
+                if (gameboard[x + 1][y + 1].getColour() != colour && !gameboard[x + 1][y + 1].isTransparent()
                         && gameboard[x + 2][y + 2] == null)
                     return true;
             }
             //diagonal - -
             if (x > 1 && y > 1 && gameboard[x - 1][y - 1] != null) {
-                if(gameboard[x - 1][y - 1].getColour() != colour && !gameboard[x - 1][y - 1].isTransparent()
+                if (gameboard[x - 1][y - 1].getColour() != colour && !gameboard[x - 1][y - 1].isTransparent()
                         && gameboard[x - 2][y - 2] == null)
                     return true;
             }
             //diagonal + -
             if (x < 8 && y > 1 && gameboard[x + 1][y - 1] != null) {
-                if(gameboard[x + 1][y - 1].getColour() != colour && !gameboard[x + 1][y - 1].isTransparent()
+                if (gameboard[x + 1][y - 1].getColour() != colour && !gameboard[x + 1][y - 1].isTransparent()
                         && gameboard[x + 2][y - 2] == null)
                     return true;
             }
             //diagonal - +
             if (x > 1 && y < 8 && gameboard[x - 1][y + 1] != null) {
-                if(gameboard[x - 1][y + 1].getColour() != colour && !gameboard[x - 1][y + 1].isTransparent()
+                if (gameboard[x - 1][y + 1].getColour() != colour && !gameboard[x - 1][y + 1].isTransparent()
                         && gameboard[x - 2][y + 2] == null)
                     return true;
             }
@@ -280,9 +301,9 @@ public class Board {
 
         } else {
             int direction = man.getColour() == Colour.WHITE ? 1 : -1;
-            if (gameboard[x + 1][y + direction] == null)
+            if (x < 9 && y + direction < 10 && y + direction >= 0 && gameboard[x + 1][y + direction] == null)
                 movesList.add(new Coordinates(x + 1, y + direction));
-            if (gameboard[x - 1][y + direction] == null)
+            if (x > 0 && y + direction < 10 && y + direction >= 0 && gameboard[x - 1][y + direction] == null)
                 movesList.add(new Coordinates(x - 1, y + direction));
 
         }
@@ -307,7 +328,7 @@ public class Board {
     }
 
     private int valueCapture(Board board, Piece piece, Coordinates capture) {
-        board.movePiece(piece, capture.getX(), capture.getY(),false);
+        board.movePiece(piece, capture.getX(), capture.getY(), false);
         if (!board.isCaptureAvailable(piece)) return 1;
 
         else {
