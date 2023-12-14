@@ -4,13 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="finished tests for board, debugged Board and added custom Pair class">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/gui/boardScene.fxml" afterDir="false" />
+    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="added Game class and made playable application">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gui/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/CheckersApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gui/HelloController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/gui/hello-view.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Piece.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +27,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
@@ -129,7 +131,21 @@
       <workItem from="1697710318386" duration="8668000" />
       <workItem from="1697736906146" duration="2815000" />
       <workItem from="1697798549969" duration="2669000" />
-      <workItem from="1697895923534" duration="13998000" />
+      <workItem from="1697895923534" duration="14197000" />
+      <workItem from="1697971048723" duration="389000" />
+      <workItem from="1699312223457" duration="30000" />
+      <workItem from="1699312273709" duration="6000" />
+      <workItem from="1700670885050" duration="37000" />
+      <workItem from="1701370277890" duration="341000" />
+      <workItem from="1701370636794" duration="1725000" />
+      <workItem from="1702244209890" duration="1548000" />
+      <workItem from="1702292749987" duration="609000" />
+      <workItem from="1702304381471" duration="13484000" />
+      <workItem from="1702377776508" duration="753000" />
+      <workItem from="1702388769526" duration="5596000" />
+      <workItem from="1702470950663" duration="809000" />
+      <workItem from="1702542648132" duration="11316000" />
+      <workItem from="1702576369444" duration="10459000" />
     </task>
     <task id="LOCAL-00001" summary="added Coordinates, King, Man, Piece classes and capture finding methods in Board">
       <option name="closed" value="true" />
@@ -155,7 +171,15 @@
       <option name="project" value="LOCAL" />
       <updated>1697718890942</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added Game class and made playable application">
+      <option name="closed" value="true" />
+      <created>1697927806790</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1697927806790</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,7 +189,8 @@
     <MESSAGE value="added Coordinates, King, Man, Piece classes and capture finding methods in Board" />
     <MESSAGE value="finished Board class and added tests for Man and King" />
     <MESSAGE value="finished tests for board, debugged Board and added custom Pair class" />
-    <option name="LAST_COMMIT_MESSAGE" value="finished tests for board, debugged Board and added custom Pair class" />
+    <MESSAGE value="added Game class and made playable application" />
+    <option name="LAST_COMMIT_MESSAGE" value="added Game class and made playable application" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

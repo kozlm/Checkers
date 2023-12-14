@@ -21,16 +21,12 @@ public abstract class Piece {
 
 
     public Coordinates getCords() {
-        return cords;
-    }
-
-    public void setCords(Coordinates cords) {
-        this.cords = cords;
+        return new Coordinates(cords.getX(), cords.getY());
     }
 
     private Coordinates cords;
 
-    public void move(int x, int y){
+    public void move(int x, int y) {
         cords.setX(x);
         cords.setY(y);
     }

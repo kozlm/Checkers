@@ -132,7 +132,6 @@ public class Board {
     public boolean movePiece(Piece piece, int xDestination, int yDestination) {
         return movePiece(piece, xDestination, yDestination, true);
     }
-
     public List<Coordinates> getPossibleMoves(Piece piece) {
         if (!isCaptureAvailable(piece) && isCaptureAvailable(piece.getColour())) return new ArrayList<>();
         if (piece instanceof King) {
@@ -144,6 +143,17 @@ public class Board {
         }
     }
 
+    public List<Pair<Coordinates, Coordinates>> getPossibleMoves(Colour colour) {
+        List<Piece> pieces = colour == Colour.WHITE ? whitePieces : blackPieces;
+        List<Pair<Coordinates, Coordinates>> moves = new ArrayList<>();
+        for (Piece piece : pieces) {
+            Coordinates src = piece.getCords();
+            for (Coordinates cords : getPossibleMoves(piece)) {
+                moves.add(new Pair<>(src, cords));
+            }
+        }
+        return moves;
+    }
 
     public List<Coordinates> getAvailableCaptures(Piece piece) {
         if (isCaptureAvailable(piece)) {
@@ -343,8 +353,10 @@ public class Board {
             return maxValue;
         }
     }
-
-    private Board cloneBoard() {
+    public double getCurrentValue(){
+        return (double) (whitePieces.size() - blackPieces.size());
+    }
+    protected Board cloneBoard() {
         Board clonedBoard = new Board(true);
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {

@@ -1,6 +1,7 @@
 package gui;
 
 import gamelogic.*;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,12 +16,16 @@ import javafx.scene.shape.Rectangle;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class BoardController implements Initializable {
 
     Game game;
     Node chosenPiece;
     Color chosenSquare, darkSquare, lightSquare;
+    int mode;
+    CheckersAI blackAI;
 
     @FXML
     private GridPane boardGrid;
@@ -32,8 +37,11 @@ public class BoardController implements Initializable {
         darkSquare = Color.BURLYWOOD;
         lightSquare = Color.BISQUE;
         chosenPiece = null;
-        game = new Game(0);
+        mode = 1;
+        game = new Game(mode);
+        blackAI = new CheckersAI(Colour.BLACK, 3, game.getBoard());
         showBoard();
+
     }
 
     private void showBoard() {
@@ -51,7 +59,7 @@ public class BoardController implements Initializable {
                     else circ.setFill(Color.BLACK);
                     if (pos instanceof King) {
                         circ.setStroke(Color.RED);
-                        circ.setRadius(20);
+                        circ.setRadius(22.5);
                         circ.setStrokeWidth(5);
                     }
                     boardGrid.add(circ, i, j);
@@ -69,17 +77,35 @@ public class BoardController implements Initializable {
             int xDestination = GridPane.getColumnIndex((Node) event.getSource());
             int yDestination = 9 - GridPane.getRowIndex((Node) event.getSource());
             if (((Rectangle) event.getSource()).getFill() == chosenSquare) {
-                game.makeMove(xOrigin,yOrigin,xDestination,yDestination);
-                boardGrid.getChildren().clear();
-                showBoard();
+                game.makeMove(xOrigin, yOrigin, xDestination, yDestination);
+                Platform.runLater(() -> {
+                    boardGrid.getChildren().clear();
+                    showBoard();
+                    checkWinner();
+                });
+                if (mode == 1) {
+                    while (game.whoseTurn() == Colour.BLACK) {
+                        Pair<Coordinates, Coordinates> generatedMove = blackAI.findBestMove();
+                        game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
+                        Platform.runLater(() -> {
+                            boardGrid.getChildren().clear();
+                            showBoard();
+                            checkWinner();
+                        });
+                    }
+                }
             }
+
         }
-        if (game.whoWon()==Colour.WHITE) {
+    }
+
+    private void checkWinner() {
+        if (game.whoWon() == Colour.WHITE) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("white");
             alert.showAndWait();
         }
-        if (game.whoWon()==Colour.BLACK) {
+        if (game.whoWon() == Colour.BLACK) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("black");
             alert.showAndWait();

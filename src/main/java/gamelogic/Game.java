@@ -9,19 +9,24 @@ import java.util.List;
 
 public class Game {
 
+    private Board board;
+    private int mode;
+
+    private Colour whoseTurn;
+    private String firstPlayersName, secondPlayersName;
+
+    public Game(int mode) {
+        this.board = new Board();
+        this.mode = mode;
+        this.whoseTurn = Colour.WHITE;
+    }
+
     public Board getBoard() {
         return board;
     }
 
-    private Board board;
-    private int mode;
-    Colour whoseTurn;
-    private String firstPlayersName, secondPlayersName;
-
-    public Game(int mode) {
-        board = new Board();
-        this.mode = mode;
-        whoseTurn = Colour.WHITE;
+    public Colour whoseTurn() {
+        return whoseTurn;
     }
 
     public Colour whoWon() {
