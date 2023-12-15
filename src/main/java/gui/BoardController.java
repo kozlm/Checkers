@@ -2,6 +2,8 @@ package gui;
 
 import gamelogic.*;
 import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -26,7 +28,7 @@ public class BoardController implements Initializable {
     Color chosenSquare, darkSquare, lightSquare;
     int mode;
     CheckersAI blackAI;
-
+    private Service<Pair<Coordinates, Coordinates>> aiService;
     @FXML
     private GridPane boardGrid;
 
@@ -41,7 +43,7 @@ public class BoardController implements Initializable {
         game = new Game(mode);
         blackAI = new CheckersAI(Colour.BLACK, 3, game.getBoard());
         showBoard();
-
+        initializeAI();
     }
 
     private void showBoard() {
@@ -69,6 +71,32 @@ public class BoardController implements Initializable {
         }
     }
 
+    private void initializeAI() {
+        aiService = new Service<Pair<Coordinates, Coordinates>>() {
+            @Override
+            protected Task createTask() {
+                return new Task<Pair<Coordinates, Coordinates>>() {
+                    @Override
+                    protected Pair<Coordinates, Coordinates> call() throws Exception {
+                        return blackAI.findBestMove();
+                    }
+                };
+            }
+        };
+
+
+        aiService.setOnSucceeded(workerStateEvent -> {
+            Pair<Coordinates, Coordinates> generatedMove = aiService.getValue();
+            Platform.runLater(() -> {
+                game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
+                boardGrid.getChildren().clear();
+                showBoard();
+                checkWinner();
+                if (game.whoseTurn() == Colour.BLACK) aiService.restart();
+            });
+        });
+    }
+
     @FXML
     private void move(MouseEvent event) {
         if (event.getSource() instanceof Rectangle && chosenPiece != null) {
@@ -83,19 +111,8 @@ public class BoardController implements Initializable {
                     showBoard();
                     checkWinner();
                 });
-                if (mode == 1) {
-                    while (game.whoseTurn() == Colour.BLACK) {
-                        Pair<Coordinates, Coordinates> generatedMove = blackAI.findBestMove();
-                        game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
-                        Platform.runLater(() -> {
-                            boardGrid.getChildren().clear();
-                            showBoard();
-                            checkWinner();
-                        });
-                    }
-                }
+                if (mode == 1 && game.whoseTurn() == Colour.BLACK) aiService.restart();
             }
-
         }
     }
 

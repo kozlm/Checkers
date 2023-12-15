@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="added Game class and made playable application">
+    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="added AI class">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Piece.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -145,7 +142,8 @@
       <workItem from="1702388769526" duration="5596000" />
       <workItem from="1702470950663" duration="809000" />
       <workItem from="1702542648132" duration="11316000" />
-      <workItem from="1702576369444" duration="10459000" />
+      <workItem from="1702576369444" duration="11159000" />
+      <workItem from="1702641695852" duration="4887000" />
     </task>
     <task id="LOCAL-00001" summary="added Coordinates, King, Man, Piece classes and capture finding methods in Board">
       <option name="closed" value="true" />
@@ -179,7 +177,23 @@
       <option name="project" value="LOCAL" />
       <updated>1697927806790</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added AI">
+      <option name="closed" value="true" />
+      <created>1702596734846</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1702596734846</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added AI class">
+      <option name="closed" value="true" />
+      <created>1702596756526</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1702596756526</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -190,7 +204,9 @@
     <MESSAGE value="finished Board class and added tests for Man and King" />
     <MESSAGE value="finished tests for board, debugged Board and added custom Pair class" />
     <MESSAGE value="added Game class and made playable application" />
-    <option name="LAST_COMMIT_MESSAGE" value="added Game class and made playable application" />
+    <MESSAGE value="added AI" />
+    <MESSAGE value="added AI class" />
+    <option name="LAST_COMMIT_MESSAGE" value="added AI class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -199,6 +215,11 @@
           <properties class="java.util.ConcurrentModificationException" package="java.util" />
           <option name="timeStamp" value="6" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/gui/BoardController.java</url>
+          <line>74</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
