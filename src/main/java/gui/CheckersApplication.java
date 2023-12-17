@@ -10,7 +10,7 @@ import java.io.IOException;
 public class CheckersApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("boardScene.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mainPageScene.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Checkers");
         stage.setScene(scene);

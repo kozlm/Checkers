@@ -9,7 +9,7 @@ public class CheckersAI {
     private final int depth;
     private Board board;
     private final Colour colour, enemyColour;
-
+    private int number = 0;
     int valueIndicator;
 
     public CheckersAI(Colour colour, int depth, Board board) {
@@ -21,65 +21,64 @@ public class CheckersAI {
     }
 
     public Pair<Coordinates, Coordinates> findBestMove() {
-        PriorityQueue<Pair<Double, Pair<Coordinates, Coordinates>>> valuedMoves = new PriorityQueue<>();
+        number = 0;
+        double alpha = Double.NEGATIVE_INFINITY, beta = Double.POSITIVE_INFINITY;
+        PriorityQueue<Pair<Double, Pair<Coordinates, Coordinates>>> valuedMoves = new PriorityQueue<>(Collections.reverseOrder());
         for (Pair<Coordinates, Coordinates> move : board.getPossibleMoves(colour)) {
             Board clonedBoard = board.cloneBoard();
-            valuedMoves.add(new Pair<>(findMinMoveValue(clonedBoard, depth, colour, move), move));
+            double evaluation = minimaxFunction(clonedBoard, depth, alpha, beta, colour);
+            valuedMoves.add(new Pair<>(evaluation * valueIndicator, move));
+            if (colour == Colour.WHITE) alpha = Double.max(evaluation, alpha);
+            else beta = Double.min(evaluation, beta);
+            if (alpha >= beta) break;
         }
         if (valuedMoves.isEmpty()) throw new IllegalArgumentException("No moves available for given parameters!");
         return valuedMoves.peek().getValue();
     }
 
-    public double findMinMoveValue(Board board, int currentDepth, Colour whoseTurn, Pair<Coordinates, Coordinates> move) {
-        if (currentDepth == 0) return board.getCurrentValue() * valueIndicator;
+    public double minimaxFunction(Board position, int currentDepth, double alpha, double beta, Colour whoseMove) {
+        System.out.println(number++);
+        if (currentDepth == 0 || position.isOver()) return board.getCurrentValue();
         else {
-            PriorityQueue<Double> values = new PriorityQueue<>();
-            //enemy's turn
-            if (whoseTurn == enemyColour) {
-                //if it's the last move of enemy's turn
-                if (board.movePiece(board.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
-                    //checking all moves of AI
-                    List<Pair<Coordinates, Coordinates>> pMoves = board.getPossibleMoves(colour);
-                    for (int i = 0; i < pMoves.size() - 1; i++) {
-                        Board clonedBoard = board.cloneBoard();
-                        values.add(findMinMoveValue(clonedBoard, currentDepth - 1, colour, pMoves.get(i)));
+            if (whoseMove == Colour.WHITE) {
+                double maxEvaluation = Double.NEGATIVE_INFINITY;
+                List<Pair<Coordinates, Coordinates>> pMoves = position.getPossibleMoves(colour);
+                for (int i = 0; i < pMoves.size(); i++) {
+                    Pair<Coordinates, Coordinates> move = pMoves.get(i);
+                    Board clonedPosition = position.cloneBoard();
+                    Board nextPosition = i == pMoves.size() - 1 ? position : clonedPosition;
+                    Colour nextMove = Colour.BLACK;
+                    int nextDepth = currentDepth - 1;
+                    if (!nextPosition.movePiece(nextPosition.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
+                        nextMove = Colour.WHITE;
+                        nextDepth = currentDepth;
                     }
-                    //for the last move there is no need for cloning another board
-                    values.add(findMinMoveValue(board, currentDepth - 1, colour, pMoves.get(pMoves.size() - 1)));
-                } else {
-                    //checking all moves of AI's enemy
-                    List<Pair<Coordinates, Coordinates>> pMoves = board.getPossibleMoves(enemyColour);
-                    for (int i = 0; i < pMoves.size() - 1; i++) {
-                        Board clonedBoard = board.cloneBoard();
-                        values.add(findMinMoveValue(clonedBoard, currentDepth, enemyColour, pMoves.get(i)));
-                    }
-                    //for the last move there is no need for cloning another board
-                    values.add(findMinMoveValue(board, currentDepth, enemyColour, pMoves.get(pMoves.size() - 1)));
+                    double evaluation = minimaxFunction(nextPosition, nextDepth, alpha, beta, nextMove);
+                    maxEvaluation = Double.max(maxEvaluation, evaluation);
+                    alpha = Double.max(alpha, evaluation);
+                    if (alpha >= beta) break;
                 }
-                //AI's turn
+                return maxEvaluation;
             } else {
-                //if it's the last move of AI's turn
-                if (board.movePiece(board.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
-                    //checking all moves of AI's enemy
-                    List<Pair<Coordinates, Coordinates>> pMoves = board.getPossibleMoves(enemyColour);
-                    for (int i = 0; i < pMoves.size() - 1; i++) {
-                        Board clonedBoard = board.cloneBoard();
-                        values.add(findMinMoveValue(clonedBoard, currentDepth, enemyColour, pMoves.get(i)));
+                double minEvaluation = Double.POSITIVE_INFINITY;
+                List<Pair<Coordinates, Coordinates>> pMoves = position.getPossibleMoves(colour);
+                for (int i = 0; i < pMoves.size(); i++) {
+                    Pair<Coordinates, Coordinates> move = pMoves.get(i);
+                    Board clonedPosition = position.cloneBoard();
+                    Board nextPosition = i == pMoves.size() - 1 ? position : clonedPosition;
+                    Colour nextMove = Colour.WHITE;
+                    int nextDepth = currentDepth - 1;
+                    if (!nextPosition.movePiece(nextPosition.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
+                        nextMove = Colour.BLACK;
+                        nextDepth = currentDepth;
                     }
-                    //for the last move there is no need for cloning another board
-                    values.add(findMinMoveValue(board, currentDepth, enemyColour, pMoves.get(pMoves.size() - 1)));
-                } else {
-                    //checking all moves of AI
-                    List<Pair<Coordinates, Coordinates>> pMoves = board.getPossibleMoves(colour);
-                    for (int i = 0; i < pMoves.size() - 1; i++) {
-                        Board clonedBoard = board.cloneBoard();
-                        values.add(findMinMoveValue(clonedBoard, currentDepth, colour, pMoves.get(i)));
-                    }
-                    //for the last move there is no need for cloning another board
-                    values.add(findMinMoveValue(board, currentDepth, colour, pMoves.get(pMoves.size() - 1)));
+                    double evaluation = minimaxFunction(nextPosition, nextDepth, alpha, beta, nextMove);
+                    minEvaluation = Double.min(minEvaluation, evaluation);
+                    beta = Double.min(beta, evaluation);
+                    if (alpha >= beta) break;
                 }
+                return minEvaluation;
             }
-            return values.isEmpty() ? -500.0 * valueIndicator : values.poll();
         }
     }
 

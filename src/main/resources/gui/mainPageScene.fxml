@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainPageController">
+   <children>
+      <Label alignment="CENTER" layoutX="175.0" layoutY="29.0" prefHeight="44.0" prefWidth="251.0" text="Choose mode">
+         <font>
+            <Font name="Calibri" size="36.0" />
+         </font>
+      </Label>
+      <ChoiceBox fx:id="colourChoice" layoutX="244.0" layoutY="270.0" prefHeight="25.0" prefWidth="114.0" />
+      <ChoiceBox fx:id="modeChoice" layoutX="226.0" layoutY="86.0" prefWidth="150.0" />
+      <TextField fx:id="firstPlayer" layoutX="117.0" layoutY="176.0" />
+      <TextField fx:id="secondPlayer" layoutX="334.0" layoutY="176.0" />
+      <Button fx:id="go" layoutX="266.0" layoutY="330.0" mnemonicParsing="false" onAction="#go" prefHeight="34.0" prefWidth="68.0" text="GO">
+         <font>
+            <Font name="Calibri" size="18.0" />
+         </font>
+      </Button>
+      <Label fx:id="enterName" alignment="CENTER" layoutX="240.0" layoutY="131.0" text="Enter name">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label fx:id="chooseColour" alignment="CENTER" layoutX="216.0" layoutY="229.0" prefHeight="35.0" prefWidth="169.0" text="Choose colour">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

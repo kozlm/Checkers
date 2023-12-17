@@ -23,12 +23,14 @@ import java.util.concurrent.TimeUnit;
 
 public class BoardController implements Initializable {
 
-    Game game;
-    Node chosenPiece;
-    Color chosenSquare, darkSquare, lightSquare;
-    int mode;
-    CheckersAI blackAI;
-    private Service<Pair<Coordinates, Coordinates>> aiService;
+    private Game game;
+    private Node chosenPiece;
+    private Color chosenSquare, darkSquare, lightSquare;
+    private int mode;
+    private Colour whichColour;
+    private String whiteName, blackName;
+    private CheckersAI blackAI, whiteAI;
+    private Service<Pair<Coordinates, Coordinates>> whiteAIService, blackAIService;
     @FXML
     private GridPane boardGrid;
 
@@ -39,11 +41,16 @@ public class BoardController implements Initializable {
         darkSquare = Color.BURLYWOOD;
         lightSquare = Color.BISQUE;
         chosenPiece = null;
-        mode = 1;
+        mode = GameData.getInstance().getMode();
+        whiteName = GameData.getInstance().getWhiteName();
+        blackName = GameData.getInstance().getBlackName();
+        whichColour = GameData.getInstance().whichColour();
         game = new Game(mode);
-        blackAI = new CheckersAI(Colour.BLACK, 3, game.getBoard());
+        blackAI = new CheckersAI(Colour.BLACK, 6, game.getBoard());
+        whiteAI = new CheckersAI(Colour.WHITE, 6, game.getBoard());
         showBoard();
         initializeAI();
+        if (mode == 2) whiteAIService.restart();
     }
 
     private void showBoard() {
@@ -72,7 +79,32 @@ public class BoardController implements Initializable {
     }
 
     private void initializeAI() {
-        aiService = new Service<Pair<Coordinates, Coordinates>>() {
+        whiteAIService = new Service<Pair<Coordinates, Coordinates>>() {
+            @Override
+            protected Task createTask() {
+                return new Task<Pair<Coordinates, Coordinates>>() {
+                    @Override
+                    protected Pair<Coordinates, Coordinates> call() throws Exception {
+                        return whiteAI.findBestMove();
+                    }
+                };
+            }
+        };
+
+
+        whiteAIService.setOnSucceeded(workerStateEvent -> {
+            Pair<Coordinates, Coordinates> generatedMove = whiteAIService.getValue();
+            Platform.runLater(() -> {
+                game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
+                boardGrid.getChildren().clear();
+                showBoard();
+                checkWinner();
+                if (game.whoseTurn() == Colour.WHITE) whiteAIService.restart();
+                else if (mode == 2) blackAIService.restart();
+            });
+        });
+
+        blackAIService = new Service<Pair<Coordinates, Coordinates>>() {
             @Override
             protected Task createTask() {
                 return new Task<Pair<Coordinates, Coordinates>>() {
@@ -85,14 +117,15 @@ public class BoardController implements Initializable {
         };
 
 
-        aiService.setOnSucceeded(workerStateEvent -> {
-            Pair<Coordinates, Coordinates> generatedMove = aiService.getValue();
+        blackAIService.setOnSucceeded(workerStateEvent -> {
+            Pair<Coordinates, Coordinates> generatedMove = blackAIService.getValue();
             Platform.runLater(() -> {
                 game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
                 boardGrid.getChildren().clear();
                 showBoard();
                 checkWinner();
-                if (game.whoseTurn() == Colour.BLACK) aiService.restart();
+                if (game.whoseTurn() == Colour.BLACK) blackAIService.restart();
+                else if (mode == 2) whiteAIService.restart();
             });
         });
     }
@@ -111,7 +144,7 @@ public class BoardController implements Initializable {
                     showBoard();
                     checkWinner();
                 });
-                if (mode == 1 && game.whoseTurn() == Colour.BLACK) aiService.restart();
+                if (mode == 1 && game.whoseTurn() == Colour.BLACK) blackAIService.restart();
             }
         }
     }

@@ -356,6 +356,10 @@ public class Board {
     public double getCurrentValue(){
         return (double) (whitePieces.size() - blackPieces.size());
     }
+    public boolean isOver(){
+        if (whitePieces.isEmpty() || blackPieces.isEmpty()) return true;
+        else return false;
+    }
     protected Board cloneBoard() {
         Board clonedBoard = new Board(true);
         for (int i = 0; i < 10; i++) {

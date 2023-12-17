@@ -4,9 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="added AI class">
+    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="repaired AI mode">
+      <change afterPath="$PROJECT_DIR$/src/main/java/gui/GameData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/gui/MainPageController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gui/CheckersApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/CheckersApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +23,7 @@
       <list>
         <option value="Enum" />
         <option value="JUnit5 Test Class" />
+        <option value="FxmlFile" />
         <option value="Class" />
       </list>
     </option>
@@ -144,6 +150,10 @@
       <workItem from="1702542648132" duration="11316000" />
       <workItem from="1702576369444" duration="11159000" />
       <workItem from="1702641695852" duration="4887000" />
+      <workItem from="1702683707815" duration="54000" />
+      <workItem from="1702726370812" duration="2169000" />
+      <workItem from="1702742563657" duration="11504000" />
+      <workItem from="1702768016266" duration="6421000" />
     </task>
     <task id="LOCAL-00001" summary="added Coordinates, King, Man, Piece classes and capture finding methods in Board">
       <option name="closed" value="true" />
@@ -193,7 +203,15 @@
       <option name="project" value="LOCAL" />
       <updated>1702596756526</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="repaired AI mode">
+      <option name="closed" value="true" />
+      <created>1702683754284</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1702683754284</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,7 +224,8 @@
     <MESSAGE value="added Game class and made playable application" />
     <MESSAGE value="added AI" />
     <MESSAGE value="added AI class" />
-    <option name="LAST_COMMIT_MESSAGE" value="added AI class" />
+    <MESSAGE value="repaired AI mode" />
+    <option name="LAST_COMMIT_MESSAGE" value="repaired AI mode" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -216,9 +235,14 @@
           <option name="timeStamp" value="6" />
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java</url>
+          <line>34</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/gui/BoardController.java</url>
-          <line>74</line>
-          <option name="timeStamp" value="8" />
+          <line>39</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
