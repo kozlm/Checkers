@@ -46,8 +46,8 @@ public class BoardController implements Initializable {
         blackName = GameData.getInstance().getBlackName();
         whichColour = GameData.getInstance().whichColour();
         game = new Game(mode);
-        blackAI = new CheckersAI(Colour.BLACK, 6, game.getBoard());
-        whiteAI = new CheckersAI(Colour.WHITE, 6, game.getBoard());
+        blackAI = new CheckersAI(Colour.BLACK, 5, game.getBoard());
+        whiteAI = new CheckersAI(Colour.WHITE, 5, game.getBoard());
         showBoard();
         initializeAI();
         if (mode == 2) whiteAIService.restart();

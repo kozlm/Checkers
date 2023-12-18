@@ -354,7 +354,7 @@ public class Board {
         }
     }
     public double getCurrentValue(){
-        return (double) (whitePieces.size() - blackPieces.size());
+        return whitePieces.size() - blackPieces.size();
     }
     public boolean isOver(){
         if (whitePieces.isEmpty() || blackPieces.isEmpty()) return true;
