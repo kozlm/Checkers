@@ -11,6 +11,7 @@ public class CheckersAI {
     private final Colour colour, enemyColour;
     int valueIndicator;
 
+
     public CheckersAI(Colour colour, int depth, Board board) {
         this.depth = depth;
         this.colour = colour;
@@ -21,33 +22,42 @@ public class CheckersAI {
 
     public Pair<Coordinates, Coordinates> findBestMove() {
         double alpha = Double.NEGATIVE_INFINITY, beta = Double.POSITIVE_INFINITY;
-        PriorityQueue<Pair<Double, Pair<Coordinates, Coordinates>>> valuedMoves = colour == Colour.WHITE ?
-                new PriorityQueue<>(Collections.reverseOrder()) : new PriorityQueue<>();
-        System.out.println("----------------------------------------------------");
-        for (Pair<Coordinates, Coordinates> move : board.getPossibleMoves(colour)) {
+        List<Pair<Coordinates, Coordinates>> possibleMoves = board.getPossibleMoves(colour);
+        Collections.shuffle(possibleMoves);
+        Pair<Coordinates, Coordinates> bestMove = null;
+        double bestValue = colour == Colour.WHITE ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY;
+        for (Pair<Coordinates, Coordinates> move : possibleMoves) {
             Board clonedBoard = board.cloneBoard();
             Colour nextMove = enemyColour;
             int depth = this.depth;
-            if (!clonedBoard.movePiece(clonedBoard.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
+            if (!clonedBoard.movePiece
+                    (clonedBoard.getGameboard()[move.getKey().getX()][move.getKey().getY()], move.getValue().getX(), move.getValue().getY())) {
                 nextMove = colour;
                 depth = depth + 1;
             }
             double evaluation = minimaxFunction(clonedBoard, depth, alpha, beta, nextMove);
-            System.out.println(evaluation);
-            valuedMoves.add(new Pair<>(evaluation, move));
-            if (colour == Colour.WHITE) alpha = Double.max(evaluation, alpha);
-            else beta = Double.min(evaluation, beta);
-            //if (alpha >= beta) break;
+            if (colour == Colour.WHITE) {
+                alpha = Double.max(evaluation, alpha);
+                if (evaluation > bestValue) {
+                    bestValue = evaluation;
+                    bestMove = move;
+                }
+            }
+            else {
+                beta = Double.min(evaluation, beta);
+                if (evaluation < bestValue) {
+                    bestValue = evaluation;
+                    bestMove = move;
+                }
+            }
         }
-        if (valuedMoves.isEmpty()) throw new IllegalArgumentException("No moves available for given parameters!");
-        return valuedMoves.peek().getValue();
+        if (bestMove == null) throw new IllegalArgumentException("No moves available for given parameters!");
+        return bestMove;
     }
 
     public double minimaxFunction(Board position, int currentDepth, double alpha, double beta, Colour whoseMove) {
-        if (currentDepth == 0 || position.isOver()) {
-
-            return position.getCurrentValue();
-        } else {
+         if (currentDepth == 0 || position.isOver()) return position.getCurrentValue();
+        else {
             if (whoseMove == Colour.WHITE) {
                 double maxEvaluation = Double.NEGATIVE_INFINITY;
                 for (Pair<Coordinates, Coordinates> move : position.getPossibleMoves(Colour.WHITE)) {
@@ -61,7 +71,7 @@ public class CheckersAI {
                     double evaluation = minimaxFunction(clonedBoard, nextDepth, alpha, beta, nextMove);
                     maxEvaluation = Double.max(maxEvaluation, evaluation);
                     alpha = Double.max(alpha, maxEvaluation);
-                    //if (alpha >= beta) break;
+                    if (alpha >= beta) break;
                 }
                 return maxEvaluation;
             } else {
@@ -77,7 +87,7 @@ public class CheckersAI {
                     double evaluation = minimaxFunction(clonedBoard, nextDepth, alpha, beta, nextMove);
                     minEvaluation = Double.min(minEvaluation, evaluation);
                     beta = Double.min(beta, minEvaluation);
-                    //if (alpha >= beta) break;
+                    if (alpha >= beta) break;
                 }
                 return minEvaluation;
             }

@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="repaired AI mode">
-      <change afterPath="$PROJECT_DIR$/src/main/java/gui/GameData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/gui/MainPageController.java" afterDir="false" />
+    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="repaired minimax algorithm">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gui/CheckersApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/CheckersApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Pair.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Pair.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,7 +149,17 @@
       <workItem from="1702683707815" duration="54000" />
       <workItem from="1702726370812" duration="2169000" />
       <workItem from="1702742563657" duration="11504000" />
-      <workItem from="1702768016266" duration="6421000" />
+      <workItem from="1702768016266" duration="6875000" />
+      <workItem from="1702811573443" duration="4974000" />
+      <workItem from="1702839064885" duration="13063000" />
+      <workItem from="1702886373308" duration="7941000" />
+      <workItem from="1702926239489" duration="7443000" />
+      <workItem from="1702938621037" duration="2668000" />
+      <workItem from="1703002738761" duration="950000" />
+      <workItem from="1703016482229" duration="6719000" />
+      <workItem from="1703078515555" duration="10921000" />
+      <workItem from="1703146455618" duration="109000" />
+      <workItem from="1709753576117" duration="5559000" />
     </task>
     <task id="LOCAL-00001" summary="added Coordinates, King, Man, Piece classes and capture finding methods in Board">
       <option name="closed" value="true" />
@@ -211,11 +217,38 @@
       <option name="project" value="LOCAL" />
       <updated>1702683754284</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="addded main page and repaired AI">
+      <option name="closed" value="true" />
+      <created>1702775451215</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1702775451215</updated>
+    </task>
+    <task id="LOCAL-00009" summary="repaired minimax algorithm">
+      <option name="closed" value="true" />
+      <created>1702941374568</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1702941374568</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added Coordinates, King, Man, Piece classes and capture finding methods in Board" />
@@ -225,7 +258,9 @@
     <MESSAGE value="added AI" />
     <MESSAGE value="added AI class" />
     <MESSAGE value="repaired AI mode" />
-    <option name="LAST_COMMIT_MESSAGE" value="repaired AI mode" />
+    <MESSAGE value="addded main page and repaired AI" />
+    <MESSAGE value="repaired minimax algorithm" />
+    <option name="LAST_COMMIT_MESSAGE" value="repaired minimax algorithm" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -234,27 +269,27 @@
           <properties class="java.util.ConcurrentModificationException" package="java.util" />
           <option name="timeStamp" value="6" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gui/BoardController.java</url>
-          <line>39</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="JUnit">
         <watch expression="((Board)board).gameboard" custom="gamelogic.Board" />
       </configuration>
+      <configuration name="Application">
+        <watch expression="valuedMoves.toArray()[0]" />
+        <watch expression="board.blackPieces.get(19)" />
+        <watch expression="board.blackPieces.get(14)" />
+        <watch expression="board.blackPieces.get(14)" />
+        <watch expression="valuedMoves.toArray()[6]" />
+      </configuration>
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Checkers$BoardTest.ic" NAME="BoardTest Coverage Results" MODIFIED="1697654514766" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
       <FILTER>gamelogic.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Checkers$CheckersApplication.ic" NAME="CheckersApplication Coverage Results" MODIFIED="1702842746115" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>gui.*</FILTER>
     </SUITE>
   </component>
 </project>

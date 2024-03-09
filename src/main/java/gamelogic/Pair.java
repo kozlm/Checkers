@@ -26,6 +26,11 @@ public class Pair<K extends Comparable<K>, T extends Comparable<T>> implements C
     }
 
     @Override
+    public String toString() {
+        return key.toString() + " -> " + value.toString();
+    }
+
+    @Override
     public int compareTo(Pair<K,T> other) {
         int compareResult = this.key.compareTo(other.key);
 
