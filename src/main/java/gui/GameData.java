@@ -11,7 +11,7 @@ public class GameData {
 
     private static int mode;
     private static String whiteName, blackName;
-    private static Colour whichColour;
+    private static Colour whichColour = Colour.WHITE;
 
     public static int getMode() {
         return mode;

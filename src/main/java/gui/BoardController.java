@@ -4,7 +4,6 @@ import gamelogic.*;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -18,15 +17,13 @@ import javafx.scene.shape.Rectangle;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class BoardController implements Initializable {
 
     private Game game;
     private Node chosenPiece;
     private Color chosenSquare, darkSquare, lightSquare;
-    private int mode;
+    private int mode, perspectiveIndicator;
     private Colour whichColour;
     private String whiteName, blackName;
     private CheckersAI blackAI, whiteAI;
@@ -41,16 +38,17 @@ public class BoardController implements Initializable {
         darkSquare = Color.BURLYWOOD;
         lightSquare = Color.BISQUE;
         chosenPiece = null;
-        mode = GameData.getInstance().getMode();
-        whiteName = GameData.getInstance().getWhiteName();
-        blackName = GameData.getInstance().getBlackName();
-        whichColour = GameData.getInstance().whichColour();
+        mode = GameData.getMode();
+        whiteName = GameData.getWhiteName();
+        blackName = GameData.getBlackName();
+        whichColour = GameData.whichColour();
+        perspectiveIndicator = whichColour == Colour.WHITE ? 0 : 9;
         game = new Game(mode);
         blackAI = new CheckersAI(Colour.BLACK, 7, game.getBoard());
         whiteAI = new CheckersAI(Colour.WHITE, 7, game.getBoard());
         showBoard();
         initializeAI();
-        if (mode == 2) whiteAIService.restart();
+        if (mode == 2 || (mode == 1 && whichColour == Colour.BLACK)) whiteAIService.restart();
     }
 
     private void showBoard() {
@@ -62,7 +60,10 @@ public class BoardController implements Initializable {
                 rec.setOnMouseClicked(this::move);
                 boardGrid.add(rec, i, j);
                 Circle circ = new Circle(25);
-                Piece pos = game.getPosition(i, 9 - j);
+                Piece pos = game.getPosition(
+                        Math.abs(perspectiveIndicator - i),
+                        Math.abs(perspectiveIndicator - (9 - j))
+                );
                 if (pos != null) {
                     if (pos.getColour() == Colour.WHITE) circ.setFill(Color.WHITE);
                     else circ.setFill(Color.BLACK);
@@ -133,10 +134,10 @@ public class BoardController implements Initializable {
     @FXML
     private void move(MouseEvent event) {
         if (event.getSource() instanceof Rectangle && chosenPiece != null) {
-            int xOrigin = GridPane.getColumnIndex(chosenPiece);
-            int yOrigin = 9 - GridPane.getRowIndex(chosenPiece);
-            int xDestination = GridPane.getColumnIndex((Node) event.getSource());
-            int yDestination = 9 - GridPane.getRowIndex((Node) event.getSource());
+            int xOrigin = Math.abs(perspectiveIndicator - GridPane.getColumnIndex(chosenPiece));
+            int yOrigin = Math.abs(perspectiveIndicator - (9 - GridPane.getRowIndex(chosenPiece)));
+            int xDestination = Math.abs(perspectiveIndicator - GridPane.getColumnIndex((Node) event.getSource()));
+            int yDestination = Math.abs(perspectiveIndicator - (9 - GridPane.getRowIndex((Node) event.getSource())));
             if (((Rectangle) event.getSource()).getFill() == chosenSquare) {
                 game.makeMove(xOrigin, yOrigin, xDestination, yDestination);
                 Platform.runLater(() -> {
@@ -144,7 +145,10 @@ public class BoardController implements Initializable {
                     showBoard();
                     checkWinner();
                 });
-                if (mode == 1 && game.whoseTurn() == Colour.BLACK) blackAIService.restart();
+                if (mode == 1) {
+                    if (game.whoseTurn() == Colour.BLACK) blackAIService.restart();
+                    else whiteAIService.restart();
+                }
             }
         }
     }
@@ -165,29 +169,23 @@ public class BoardController implements Initializable {
     @FXML
     private void showMoves(MouseEvent event) {
         if (event.getSource() instanceof Circle) {
-            int x = GridPane.getColumnIndex((Node) event.getSource());
-            int y = GridPane.getRowIndex((Node) event.getSource());
-            if (chosenPiece == event.getSource()) {
-                chosenPiece = null;
-                for (Node node : boardGrid.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        if ((GridPane.getColumnIndex(node) + GridPane.getRowIndex(node)) % 2 == 0)
-                            ((Rectangle) node).setFill(lightSquare);
-                        else ((Rectangle) node).setFill(darkSquare);
-                    }
+            int x = Math.abs(perspectiveIndicator - GridPane.getColumnIndex((Node) event.getSource()));
+            int y = Math.abs(perspectiveIndicator - (9 - GridPane.getRowIndex((Node) event.getSource())));
+            for (Node node : boardGrid.getChildren()) {
+                if (node instanceof Rectangle) {
+                    if ((GridPane.getColumnIndex(node) + GridPane.getRowIndex(node)) % 2 == 0)
+                        ((Rectangle) node).setFill(lightSquare);
+                    else ((Rectangle) node).setFill(darkSquare);
                 }
-            } else {
-                List<Coordinates> moves = game.getMovesForPosition(x, 9 - y);
+            }
+            if (chosenPiece == event.getSource()) chosenPiece = null;
+            else {
+                List<Coordinates> moves = game.getMovesForPosition(x, y);
                 for (Node node : boardGrid.getChildren()) {
-                    if (node instanceof Rectangle) {
-                        if ((GridPane.getColumnIndex(node) + GridPane.getRowIndex(node)) % 2 == 0)
-                            ((Rectangle) node).setFill(lightSquare);
-                        else ((Rectangle) node).setFill(darkSquare);
-                    }
-                }
-                for (Node node : boardGrid.getChildren()) {
-                    if (node instanceof Rectangle
-                            && moves.contains(new Coordinates(GridPane.getColumnIndex(node), 9 - GridPane.getRowIndex(node))))
+                    if (node instanceof Rectangle && moves.contains(new Coordinates(
+                            Math.abs(perspectiveIndicator - GridPane.getColumnIndex(node)),
+                            Math.abs(perspectiveIndicator - (9 - GridPane.getRowIndex(node)))
+                    )))
                         ((Rectangle) node).setFill(chosenSquare);
                 }
                 chosenPiece = (Node) event.getSource();
