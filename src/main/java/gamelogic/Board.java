@@ -56,9 +56,9 @@ public class Board {
         return blackPieces;
     }
 
-    private Piece[][] gameboard;
-    private List<Piece> whitePieces;
-    private List<Piece> blackPieces;
+    private final Piece[][] gameboard;
+    private final List<Piece> whitePieces;
+    private final List<Piece> blackPieces;
 
     public boolean movePiece(Piece piece, int xDestination, int yDestination, boolean shouldRemoveTransparent) {
         int xCurrent = piece.getCords().getX();

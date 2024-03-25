@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="refine finding move method in CheckersAI class">
+    <list default="true" id="efa7c4b8-f75a-427a-ac06-a51bff4114a3" name="Changes" comment="add black perspective">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Board.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Colour.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Colour.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Coordinates.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Coordinates.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gamelogic/Game.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/BoardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/gui/GameData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/gui/GameData.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +48,9 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/src/main/java/gamelogic/CheckersAI.java" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2
 }</component>
@@ -55,7 +62,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.CheckersApplication.executor": "Run",
+    "Application.CheckersApplication.executor": "Debug",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -190,7 +197,9 @@
       <workItem from="1710365180502" duration="174000" />
       <workItem from="1710365363584" duration="447000" />
       <workItem from="1710697091566" duration="42000" />
-      <workItem from="1710697141162" duration="10278000" />
+      <workItem from="1710697141162" duration="10476000" />
+      <workItem from="1711315316251" duration="5325000" />
+      <workItem from="1711386447370" duration="2524000" />
     </task>
     <task id="LOCAL-00001" summary="added Coordinates, King, Man, Piece classes and capture finding methods in Board">
       <option name="closed" value="true" />
@@ -272,7 +281,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710021320079</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="add black perspective">
+      <option name="closed" value="true" />
+      <created>1710716112508</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1710716112508</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -305,7 +322,8 @@
     <MESSAGE value="addded main page and repaired AI" />
     <MESSAGE value="repaired minimax algorithm" />
     <MESSAGE value="refine finding move method in CheckersAI class" />
-    <option name="LAST_COMMIT_MESSAGE" value="refine finding move method in CheckersAI class" />
+    <MESSAGE value="add black perspective" />
+    <option name="LAST_COMMIT_MESSAGE" value="add black perspective" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -315,9 +333,9 @@
           <option name="timeStamp" value="6" />
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/gui/BoardController.java</url>
-          <line>54</line>
-          <option name="timeStamp" value="8" />
+          <url>file://$PROJECT_DIR$/src/main/java/gamelogic/Game.java</url>
+          <line>18</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

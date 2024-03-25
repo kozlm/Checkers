@@ -146,8 +146,8 @@ public class BoardController implements Initializable {
                     checkWinner();
                 });
                 if (mode == 1) {
-                    if (game.whoseTurn() == Colour.BLACK) blackAIService.restart();
-                    else whiteAIService.restart();
+                    if (game.whoseTurn() == Colour.BLACK && whichColour == Colour.WHITE) blackAIService.restart();
+                    else if (game.whoseTurn() == Colour.WHITE && whichColour == Colour.BLACK) whiteAIService.restart();
                 }
             }
         }

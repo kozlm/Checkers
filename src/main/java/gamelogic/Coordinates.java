@@ -24,6 +24,10 @@ public class Coordinates implements Comparable<Coordinates> {
         this.y = y;
     }
 
+    public String getCheckersNotation(){
+        return ((Integer)(46 - (y * 5) + (x/2))).toString();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Coordinates) {

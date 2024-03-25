@@ -7,7 +7,7 @@ import java.util.PriorityQueue;
 
 public class CheckersAI {
     private final int depth;
-    private Board board;
+    private final Board board;
     private final Colour colour, enemyColour;
     int valueIndicator;
 

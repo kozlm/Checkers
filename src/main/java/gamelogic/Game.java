@@ -29,6 +29,29 @@ public class Game {
         return whoseTurn;
     }
 
+    public String getFEN() {
+        StringBuilder fen = new StringBuilder(whoseTurn.toString() + ":");
+        StringBuilder white = new StringBuilder("W");
+        StringBuilder black = new StringBuilder("B");
+        for (int i = 9; i >= 0; i--) {
+            for (int j = 0; j <= 9; j++) {
+                Piece piece = getPosition(j, i);
+                if (piece != null) {
+                    String pieceNotation = (piece instanceof King ? "K" : "") + piece.getCords().getCheckersNotation();
+                    if (piece.getColour() == Colour.WHITE) white.append(pieceNotation).append(",");
+                    else black.append(pieceNotation).append(",");
+                }
+            }
+        }
+
+        if (black.charAt(black.length()-1)==',') black.deleteCharAt(black.length()-1);
+        if (white.charAt(white.length()-1)==',') white.deleteCharAt(white.length()-1);
+
+        fen.append(white).append(":").append(black);
+
+        return fen.toString();
+    }
+
     public Colour whoWon() {
         boolean whiteLost = true, blackLost = true;
         for (int i = 0; i < 10; i++) {

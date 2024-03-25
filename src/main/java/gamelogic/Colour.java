@@ -2,5 +2,10 @@ package gamelogic;
 
 public enum Colour {
     BLACK,
-    WHITE
+    WHITE;
+
+    @Override
+    public String toString() {
+        return this == BLACK ? "B" : "W";
+    }
 }
