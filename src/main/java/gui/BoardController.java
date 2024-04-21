@@ -43,7 +43,7 @@ public class BoardController implements Initializable {
         blackName = GameData.getBlackName();
         whichColour = GameData.whichColour();
         perspectiveIndicator = whichColour == Colour.WHITE ? 0 : 9;
-        game = new Game(mode);
+        game = new Game();
         blackAI = new CheckersAI(Colour.BLACK, 7, game.getBoard());
         whiteAI = new CheckersAI(Colour.WHITE, 7, game.getBoard());
         showBoard();
@@ -99,8 +99,8 @@ public class BoardController implements Initializable {
                 game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
                 boardGrid.getChildren().clear();
                 showBoard();
-                checkWinner();
-                if (game.whoseTurn() == Colour.WHITE) whiteAIService.restart();
+                if (checkWinner()) stopAI();
+                else if (game.whoseTurn() == Colour.WHITE) whiteAIService.restart();
                 else if (mode == 2) blackAIService.restart();
             });
         });
@@ -124,11 +124,21 @@ public class BoardController implements Initializable {
                 game.makeMove(generatedMove.getKey().getX(), generatedMove.getKey().getY(), generatedMove.getValue().getX(), generatedMove.getValue().getY());
                 boardGrid.getChildren().clear();
                 showBoard();
-                checkWinner();
-                if (game.whoseTurn() == Colour.BLACK) blackAIService.restart();
+                if (checkWinner()) stopAI();
+                else if (game.whoseTurn() == Colour.BLACK) blackAIService.restart();
                 else if (mode == 2) whiteAIService.restart();
             });
         });
+    }
+
+    private void stopAI() {
+        if (blackAIService.isRunning()) {
+            blackAIService.cancel();
+        }
+        if (whiteAIService.isRunning()) {
+            whiteAIService.cancel();
+        }
+
     }
 
     @FXML
@@ -140,11 +150,9 @@ public class BoardController implements Initializable {
             int yDestination = Math.abs(perspectiveIndicator - (9 - GridPane.getRowIndex((Node) event.getSource())));
             if (((Rectangle) event.getSource()).getFill() == chosenSquare) {
                 game.makeMove(xOrigin, yOrigin, xDestination, yDestination);
-                Platform.runLater(() -> {
-                    boardGrid.getChildren().clear();
-                    showBoard();
-                    checkWinner();
-                });
+                boardGrid.getChildren().clear();
+                showBoard();
+                checkWinner();
                 if (mode == 1) {
                     if (game.whoseTurn() == Colour.BLACK && whichColour == Colour.WHITE) blackAIService.restart();
                     else if (game.whoseTurn() == Colour.WHITE && whichColour == Colour.BLACK) whiteAIService.restart();
@@ -153,17 +161,28 @@ public class BoardController implements Initializable {
         }
     }
 
-    private void checkWinner() {
-        if (game.whoWon() == Colour.WHITE) {
+    private boolean checkWinner() {
+        if (game.whoWon() == 'w') {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("white");
             alert.showAndWait();
+            return true;
         }
-        if (game.whoWon() == Colour.BLACK) {
+        else if (game.whoWon() == 'b') {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("black");
+            stopAI();
             alert.showAndWait();
+            return true;
         }
+        else if (game.whoWon() == 'd') {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("draw");
+            stopAI();
+            alert.showAndWait();
+            return true;
+        }
+        return false;
     }
 
     @FXML

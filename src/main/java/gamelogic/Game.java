@@ -5,19 +5,21 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Game {
 
-    private Board board;
-    private int mode;
-
+    private final Board board;
     private Colour whoseTurn;
-    private String firstPlayersName, secondPlayersName;
+    private final Map<String, Integer> positionsCounterOnWhite, positionsCounterOnBlack;
 
-    public Game(int mode) {
+
+    public Game() {
+        this.positionsCounterOnBlack = new HashMap<>();
+        this.positionsCounterOnWhite = new HashMap<>();
         this.board = new Board();
-        this.mode = mode;
         this.whoseTurn = Colour.WHITE;
     }
 
@@ -44,27 +46,34 @@ public class Game {
             }
         }
 
-        if (black.charAt(black.length()-1)==',') black.deleteCharAt(black.length()-1);
-        if (white.charAt(white.length()-1)==',') white.deleteCharAt(white.length()-1);
+        if (black.charAt(black.length() - 1) == ',') black.deleteCharAt(black.length() - 1);
+        if (white.charAt(white.length() - 1) == ',') white.deleteCharAt(white.length() - 1);
 
         fen.append(white).append(":").append(black);
 
         return fen.toString();
     }
 
-    public Colour whoWon() {
-        boolean whiteLost = true, blackLost = true;
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                if (board.getGameboard()[i][j] != null && board.getGameboard()[i][j].getColour() == Colour.WHITE)
-                    whiteLost = false;
-                if (board.getGameboard()[i][j] != null && board.getGameboard()[i][j].getColour() == Colour.BLACK)
-                    blackLost = false;
-            }
-        }
-        if (!whiteLost && !blackLost) return null;
-        else if (whiteLost) return Colour.BLACK;
-        else return Colour.WHITE;
+    public char whoWon() {
+        // checking divided into two parts due to time cost
+        // less expensive conditions
+        if (board.getWhitePieces().isEmpty() || board.getPossibleMoves(Colour.WHITE).isEmpty())
+            return 'b';
+        if (board.getBlackPieces().isEmpty() || board.getPossibleMoves(Colour.BLACK).isEmpty())
+            return 'w';
+
+        if (board.getFakeMovesCounter()>=50) return 'd';
+
+        // more expensive conditions
+        if ((positionsCounterOnWhite.containsKey(getFEN()) && positionsCounterOnWhite.get(getFEN()) >= 3)
+                || (positionsCounterOnBlack.containsKey(getFEN()) && positionsCounterOnBlack.get(getFEN()) >= 3) )
+            return 'd';
+
+        if (board.getWhitePieces().size() == 1 && board.getBlackPieces().size() == 1
+                && board.getWhitePieces().get(0) instanceof King && board.getBlackPieces().get(0) instanceof King)
+            return 'd';
+
+        return '0';
     }
 
     public Piece getPosition(int x, int y) {
@@ -78,13 +87,21 @@ public class Game {
     }
 
     private void switchTurn() {
-        if (whoseTurn == Colour.WHITE) whoseTurn = Colour.BLACK;
-        else whoseTurn = Colour.WHITE;
+        if (whoseTurn == Colour.WHITE) {
+            whoseTurn = Colour.BLACK;
+            positionsCounterOnBlack.merge(getFEN(), 1, Integer::sum);
+        } else {
+            whoseTurn = Colour.WHITE;
+            positionsCounterOnWhite.merge(getFEN(), 1, Integer::sum);
+        }
     }
 
     public void makeMove(int xOrigin, int yOrigin, int xDestination, int yDestination) {
         Piece movingPiece = board.getGameboard()[xOrigin][yOrigin];
-        if (movingPiece == null) throw new IllegalArgumentException("No piece on given position!");
+        if (movingPiece == null)
+            throw new IllegalArgumentException("No piece on given position: " + xOrigin + "x" + yOrigin);
+        if (movingPiece.getColour() != whoseTurn)
+            throw new IllegalArgumentException("Move of player with no turn (" + movingPiece.getColour().name() + ") submitted");
         else if (board.movePiece(movingPiece, xDestination, yDestination)) switchTurn();
     }
 }

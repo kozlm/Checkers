@@ -9,6 +9,7 @@ public class Board {
         gameboard = new Piece[10][10];
         blackPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
+        fakeMovesCounter = 0;
         initializeBoard();
     }
 
@@ -16,6 +17,7 @@ public class Board {
         gameboard = new Piece[10][10];
         blackPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
+        fakeMovesCounter = 0;
         if (!emptyIndicator) initializeBoard();
     }
 
@@ -59,6 +61,7 @@ public class Board {
     private final Piece[][] gameboard;
     private final List<Piece> whitePieces;
     private final List<Piece> blackPieces;
+    private int fakeMovesCounter;
 
     public boolean movePiece(Piece piece, int xDestination, int yDestination, boolean shouldRemoveTransparent) {
         int xCurrent = piece.getCords().getX();
@@ -75,6 +78,7 @@ public class Board {
             if (Math.abs(xDestination - xCurrent) == 2) {
                 capturedPiece = gameboard[xCurrent + (xDestination - xCurrent) / 2][yCurrent + (yDestination - yCurrent) / 2];
             }
+            fakeMovesCounter = 0;
         } else {
             int xIncrement = (xDestination - xCurrent) / Math.abs(xDestination - xCurrent);
             int yIncrement = (yDestination - yCurrent) / Math.abs(yDestination - yCurrent);
@@ -89,12 +93,17 @@ public class Board {
                 y += yIncrement;
             }
         }
+
         if (capturedPiece != null) {
+            fakeMovesCounter = 0;
             capturedPiece.setTransparent(true);
         }
+
+
         piece.move(xDestination, yDestination);
         gameboard[xDestination][yDestination] = piece;
         gameboard[xCurrent][yCurrent] = null;
+
         if (capturedPiece != null && isCaptureAvailable(piece)) {
             return false;
         } else {
@@ -111,6 +120,7 @@ public class Board {
                 }
             }
             promotePieces(piece.getColour());
+            if (piece instanceof King) fakeMovesCounter++;
             return true;
         }
     }
@@ -132,6 +142,7 @@ public class Board {
     public boolean movePiece(Piece piece, int xDestination, int yDestination) {
         return movePiece(piece, xDestination, yDestination, true);
     }
+
     public List<Coordinates> getPossibleMoves(Piece piece) {
         if (!isCaptureAvailable(piece) && isCaptureAvailable(piece.getColour())) return new ArrayList<>();
         if (piece instanceof King) {
@@ -242,13 +253,14 @@ public class Board {
     }
 
     private List<Coordinates> getKingsMoves(King king) {
-        boolean isCaptureAvailable = false;
-        if (isCaptureAvailable(king)) isCaptureAvailable = true;
+        boolean isCaptureAvailable = isCaptureAvailable(king);
         List<Coordinates> possibleCapturesList = new ArrayList<>();
+
         possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, 1, isCaptureAvailable));
         possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, -1, isCaptureAvailable));
         possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, -1, 1, isCaptureAvailable));
         possibleCapturesList.addAll(getKingsMovesOnDiagonal(king, 1, -1, isCaptureAvailable));
+
         return possibleCapturesList;
     }
 
@@ -353,13 +365,20 @@ public class Board {
             return maxValue;
         }
     }
-    public double getCurrentValue(){
+
+    public double getCurrentValue() {
         return whitePieces.size() - blackPieces.size();
     }
-    public boolean isOver(){
-        if (whitePieces.isEmpty() || blackPieces.isEmpty()) return true;
-        else return false;
+
+    public int getFakeMovesCounter() {
+        return fakeMovesCounter;
     }
+
+    public boolean isOver() {
+        return whitePieces.isEmpty() || blackPieces.isEmpty()
+                || getPossibleMoves(Colour.WHITE).isEmpty() || getPossibleMoves(Colour.WHITE).isEmpty();
+    }
+
     protected Board cloneBoard() {
         Board clonedBoard = new Board(true);
         for (int i = 0; i < 10; i++) {
