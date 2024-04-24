@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -162,23 +163,36 @@ public class BoardController implements Initializable {
     }
 
     private boolean checkWinner() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Three Button Alert");
+        alert.setHeaderText("This is a three button alert");
+
+        // Add buttons to the alert
+        alert.getButtonTypes().addAll(ButtonType.CLOSE, ButtonType.YES, ButtonType.NEXT);
+
+        // Show the alert and wait for user action
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.YES) {
+                System.out.println("Yes button clicked");
+            } else if (buttonType == ButtonType.NO) {
+                System.out.println("No button clicked");
+            } else if (buttonType == ButtonType.CANCEL) {
+                System.out.println("Cancel button clicked");
+            }
+        });
+
         if (game.whoWon() == 'w') {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("white");
+            alert.setContentText("White won!");
             alert.showAndWait();
             return true;
         }
         else if (game.whoWon() == 'b') {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("black");
-            stopAI();
+            alert.setContentText("Black won!");
             alert.showAndWait();
             return true;
         }
         else if (game.whoWon() == 'd') {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("draw");
-            stopAI();
+            alert.setContentText("Draw!");
             alert.showAndWait();
             return true;
         }

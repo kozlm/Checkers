@@ -6,20 +6,23 @@ import java.util.*;
 public class Board {
 
     public Board() {
-        gameboard = new Piece[10][10];
-        blackPieces = new ArrayList<>();
-        whitePieces = new ArrayList<>();
-        fakeMovesCounter = 0;
-        initializeBoard();
+        this(false);
     }
 
     public Board(boolean emptyIndicator) {
         gameboard = new Piece[10][10];
         blackPieces = new ArrayList<>();
         whitePieces = new ArrayList<>();
+        pdnBuffer = new PDNBuffer();
         fakeMovesCounter = 0;
         if (!emptyIndicator) initializeBoard();
     }
+
+    private PDNBuffer pdnBuffer;
+    private final Piece[][] gameboard;
+    private final List<Piece> whitePieces;
+    private final List<Piece> blackPieces;
+    private int fakeMovesCounter;
 
     private void initializeBoard() {
         for (int i = 0; i < 4; i++) {
@@ -44,24 +47,6 @@ public class Board {
             }
         }
     }
-
-
-    public Piece[][] getGameboard() {
-        return gameboard;
-    }
-
-    public List<Piece> getWhitePieces() {
-        return whitePieces;
-    }
-
-    public List<Piece> getBlackPieces() {
-        return blackPieces;
-    }
-
-    private final Piece[][] gameboard;
-    private final List<Piece> whitePieces;
-    private final List<Piece> blackPieces;
-    private int fakeMovesCounter;
 
     public boolean movePiece(Piece piece, int xDestination, int yDestination, boolean shouldRemoveTransparent) {
         int xCurrent = piece.getCords().getX();
@@ -105,12 +90,17 @@ public class Board {
         gameboard[xCurrent][yCurrent] = null;
 
         if (capturedPiece != null && isCaptureAvailable(piece)) {
+            pdnBuffer.addMove(
+                    new Coordinates(xCurrent, yCurrent).getCheckersNotation(),
+                    new Coordinates(xDestination, yDestination).getCheckersNotation(),
+                    true,
+                    false
+            );
             return false;
         } else {
             if (shouldRemoveTransparent) {
                 Iterator<Piece> iterator;
-                if (piece.getColour() == Colour.WHITE) iterator = blackPieces.iterator();
-                else iterator = whitePieces.iterator();
+                iterator = (piece.getColour() == Colour.WHITE) ? blackPieces.iterator() : whitePieces.iterator();
                 while (iterator.hasNext()) {
                     Piece p = iterator.next();
                     if (p.isTransparent()) {
@@ -121,6 +111,12 @@ public class Board {
             }
             promotePieces(piece.getColour());
             if (piece instanceof King) fakeMovesCounter++;
+            pdnBuffer.addMove(
+                    new Coordinates(xCurrent, yCurrent).getCheckersNotation(),
+                    new Coordinates(xDestination, yDestination).getCheckersNotation(),
+                    capturedPiece != null,
+                    true
+            );
             return true;
         }
     }
@@ -188,7 +184,6 @@ public class Board {
     }
 
     public boolean isCaptureAvailable(Piece piece) {
-
         if (piece instanceof King) {
             return (isKingsCaptureAvailableOnDiagonal((King) piece, 1, 1) || isKingsCaptureAvailableOnDiagonal((King) piece, 1, -1)
                     || isKingsCaptureAvailableOnDiagonal((King) piece, -1, 1) || isKingsCaptureAvailableOnDiagonal((King) piece, -1, -1));
@@ -364,6 +359,22 @@ public class Board {
             }
             return maxValue;
         }
+    }
+
+    public String getPDN() {
+        return pdnBuffer.toString();
+    }
+
+    public Piece[][] getGameboard() {
+        return gameboard;
+    }
+
+    public List<Piece> getWhitePieces() {
+        return whitePieces;
+    }
+
+    public List<Piece> getBlackPieces() {
+        return blackPieces;
     }
 
     public double getCurrentValue() {

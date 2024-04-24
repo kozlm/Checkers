@@ -8,4 +8,9 @@ public enum Colour {
     public String toString() {
         return this == BLACK ? "B" : "W";
     }
+
+    public Colour negate(){
+        if (this == BLACK) return WHITE;
+        else return BLACK;
+    }
 }

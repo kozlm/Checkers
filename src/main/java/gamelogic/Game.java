@@ -15,7 +15,6 @@ public class Game {
     private Colour whoseTurn;
     private final Map<String, Integer> positionsCounterOnWhite, positionsCounterOnBlack;
 
-
     public Game() {
         this.positionsCounterOnBlack = new HashMap<>();
         this.positionsCounterOnWhite = new HashMap<>();
@@ -52,6 +51,10 @@ public class Game {
         fen.append(white).append(":").append(black);
 
         return fen.toString();
+    }
+
+    public String getPDN() {
+        return board.getPDN();
     }
 
     public char whoWon() {
