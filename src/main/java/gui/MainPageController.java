@@ -35,7 +35,8 @@ public class MainPageController implements Initializable {
 
     @FXML
     private void go() throws IOException {
-        if ((!Objects.equals(colourChoice.getValue(), "Choose colour") && !Objects.equals(modeChoice.getValue(), "Choose mode"))
+        if ((!Objects.equals(colourChoice.getValue(), "Choose colour")
+                && !Objects.equals(modeChoice.getValue(), "Choose mode"))
                 || mode == 2) {
             whiteName = firstPlayer.getText();
             blackName = secondPlayer.getText();

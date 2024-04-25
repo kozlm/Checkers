@@ -1,20 +1,28 @@
 package gui;
 
 import gamelogic.*;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,6 +37,7 @@ public class BoardController implements Initializable {
     private String whiteName, blackName;
     private CheckersAI blackAI, whiteAI;
     private Service<Pair<Coordinates, Coordinates>> whiteAIService, blackAIService;
+
     @FXML
     private GridPane boardGrid;
 
@@ -81,12 +90,12 @@ public class BoardController implements Initializable {
     }
 
     private void initializeAI() {
-        whiteAIService = new Service<Pair<Coordinates, Coordinates>>() {
+        whiteAIService = new Service<>() {
             @Override
-            protected Task createTask() {
-                return new Task<Pair<Coordinates, Coordinates>>() {
+            protected Task<Pair<Coordinates, Coordinates>> createTask() {
+                return new Task<>() {
                     @Override
-                    protected Pair<Coordinates, Coordinates> call() throws Exception {
+                    protected Pair<Coordinates, Coordinates> call() {
                         return whiteAI.findBestMove();
                     }
                 };
@@ -106,12 +115,12 @@ public class BoardController implements Initializable {
             });
         });
 
-        blackAIService = new Service<Pair<Coordinates, Coordinates>>() {
+        blackAIService = new Service<>() {
             @Override
-            protected Task createTask() {
-                return new Task<Pair<Coordinates, Coordinates>>() {
+            protected Task<Pair<Coordinates, Coordinates>> createTask() {
+                return new Task<>() {
                     @Override
-                    protected Pair<Coordinates, Coordinates> call() throws Exception {
+                    protected Pair<Coordinates, Coordinates> call() {
                         return blackAI.findBestMove();
                     }
                 };
@@ -164,39 +173,53 @@ public class BoardController implements Initializable {
 
     private boolean checkWinner() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Three Button Alert");
-        alert.setHeaderText("This is a three button alert");
+        alert.setTitle("Game information");
+        alert.setHeaderText("The game is over!");
 
-        // Add buttons to the alert
-        alert.getButtonTypes().addAll(ButtonType.CLOSE, ButtonType.YES, ButtonType.NEXT);
-
-        // Show the alert and wait for user action
-        alert.showAndWait().ifPresent(buttonType -> {
-            if (buttonType == ButtonType.YES) {
-                System.out.println("Yes button clicked");
-            } else if (buttonType == ButtonType.NO) {
-                System.out.println("No button clicked");
-            } else if (buttonType == ButtonType.CANCEL) {
-                System.out.println("Cancel button clicked");
-            }
-        });
 
         if (game.whoWon() == 'w') {
             alert.setContentText("White won!");
-            alert.showAndWait();
-            return true;
-        }
-        else if (game.whoWon() == 'b') {
+        } else if (game.whoWon() == 'b') {
             alert.setContentText("Black won!");
-            alert.showAndWait();
-            return true;
-        }
-        else if (game.whoWon() == 'd') {
+        } else if (game.whoWon() == 'd') {
             alert.setContentText("Draw!");
-            alert.showAndWait();
-            return true;
-        }
-        return false;
+        } else return false;
+
+        ButtonType buttonBack = new ButtonType("Back to MainPage", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType buttonAgain = new ButtonType("Play again");
+        ButtonType buttonPDN = new ButtonType("Get PDN");
+
+        alert.getButtonTypes().setAll(buttonBack, buttonAgain, buttonPDN);
+
+        Tooltip tooltip = new Tooltip("Button Clicked!");
+
+
+        alert.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == buttonBack) {
+                try {
+                    backToMainPage();
+                } catch (IOException e) {
+                    System.out.println("Can't go to MainPage.");
+                }
+            } else if (buttonType == buttonAgain) {
+                try {
+                    playAgain();
+                } catch (IOException e) {
+                    System.out.println("Can't play again.");
+                }
+            } else if (buttonType == buttonPDN) {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent content = new ClipboardContent();
+                content.putString(game.getPDN());
+                clipboard.setContent(content);
+
+//                Button okButtonControl = (Button) alert.getDialogPane().lookupButton(okButton);
+//                tooltip.show(button, event.getScreenX(), event.getScreenY());
+//                new PauseTransition(Duration.seconds(1))
+//                        .setOnFinished(e -> tooltip.hide());
+            }
+        });
+        return true;
     }
 
     @FXML
@@ -224,5 +247,25 @@ public class BoardController implements Initializable {
                 chosenPiece = (Node) event.getSource();
             }
         }
+    }
+
+    private void playAgain() throws IOException {
+        Stage stage = (Stage) boardGrid.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("boardScene.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
+    }
+
+    private void backToMainPage() throws IOException {
+        Stage stage = (Stage) boardGrid.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("mainPageScene.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.show();
     }
 }
