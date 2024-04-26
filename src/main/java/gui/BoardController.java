@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BoardController implements Initializable {
 
@@ -54,8 +55,8 @@ public class BoardController implements Initializable {
         whichColour = GameData.whichColour();
         perspectiveIndicator = whichColour == Colour.WHITE ? 0 : 9;
         game = new Game();
-        blackAI = new CheckersAI(Colour.BLACK, 7, game.getBoard());
-        whiteAI = new CheckersAI(Colour.WHITE, 7, game.getBoard());
+        blackAI = new CheckersAI(Colour.BLACK, 5, game.getBoard());
+        whiteAI = new CheckersAI(Colour.WHITE, 5, game.getBoard());
         showBoard();
         initializeAI();
         if (mode == 2 || (mode == 1 && whichColour == Colour.BLACK)) whiteAIService.restart();
@@ -176,7 +177,6 @@ public class BoardController implements Initializable {
         alert.setTitle("Game information");
         alert.setHeaderText("The game is over!");
 
-
         if (game.whoWon() == 'w') {
             alert.setContentText("White won!");
         } else if (game.whoWon() == 'b') {
@@ -190,9 +190,36 @@ public class BoardController implements Initializable {
         ButtonType buttonPDN = new ButtonType("Get PDN");
 
         alert.getButtonTypes().setAll(buttonBack, buttonAgain, buttonPDN);
+        
+        Button pdnB = (Button) alert.getDialogPane().lookupButton(buttonPDN);
+        Tooltip tooltip = new Tooltip("Copied to clipboard!");
+        pdnB.setOnAction(event -> {
+            try {
+                double screenX = pdnB.localToScreen(pdnB.getBoundsInLocal()).getMinX();
+                double screenY = pdnB.localToScreen(pdnB.getBoundsInLocal()).getMinY();
+                tooltip.show(pdnB, screenX, screenY);
+                PauseTransition trans = new PauseTransition(Duration.seconds(1));
+                trans.setOnFinished(e -> tooltip.hide());
+                trans.play();
+            } catch (NullPointerException ignored) {
+            }
+        });
+        AtomicInteger consumer = new AtomicInteger(0);
 
-        Tooltip tooltip = new Tooltip("Button Clicked!");
-
+        alert.setOnCloseRequest(event -> {
+            if (alert.getResult() == buttonPDN) {
+                if (consumer.get() == 0) {
+                    consumer.getAndIncrement();
+                    event.consume();
+                } else {
+                    try {
+                        backToMainPage();
+                    } catch (IOException e) {
+                        System.out.println("Can't go to MainPage.");
+                    }
+                }
+            }
+        });
 
         alert.showAndWait().ifPresent(buttonType -> {
             if (buttonType == buttonBack) {
@@ -212,11 +239,6 @@ public class BoardController implements Initializable {
                 ClipboardContent content = new ClipboardContent();
                 content.putString(game.getPDN());
                 clipboard.setContent(content);
-
-//                Button okButtonControl = (Button) alert.getDialogPane().lookupButton(okButton);
-//                tooltip.show(button, event.getScreenX(), event.getScreenY());
-//                new PauseTransition(Duration.seconds(1))
-//                        .setOnFinished(e -> tooltip.hide());
             }
         });
         return true;
