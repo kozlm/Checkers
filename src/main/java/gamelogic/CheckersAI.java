@@ -1,9 +1,10 @@
 package gamelogic;
 
-import java.util.ArrayList;
+import gamelogic.pieces.Colour;
+import gamelogic.pieces.Coordinates;
+
 import java.util.Collections;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class CheckersAI {
     private final int depth;

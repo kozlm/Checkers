@@ -1,5 +1,9 @@
 package gamelogic;
 
+import gamelogic.pieces.Colour;
+import gamelogic.pieces.Coordinates;
+import gamelogic.pieces.Man;
+import gamelogic.pieces.Piece;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -7,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ManTest {
     Man man;
-    Coordinates startingCoordinates,Coordinates;
+    gamelogic.pieces.Coordinates startingCoordinates,Coordinates;
     @BeforeEach
     public void setup(){
         startingCoordinates = new Coordinates(2,0);

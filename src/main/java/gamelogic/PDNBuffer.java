@@ -1,5 +1,7 @@
 package gamelogic;
 
+import gamelogic.pieces.Colour;
+
 import java.util.ArrayList;
 
 public class PDNBuffer {

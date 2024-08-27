@@ -1,8 +1,9 @@
 package gamelogic;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
+import gamelogic.pieces.Colour;
+import gamelogic.pieces.Coordinates;
+import gamelogic.pieces.King;
+import gamelogic.pieces.Piece;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package gamelogic;
+package gamelogic.pieces;
 
 public abstract class Piece {
     public Piece(Colour colour, Coordinates cords) {

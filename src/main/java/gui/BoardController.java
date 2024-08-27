@@ -1,6 +1,10 @@
 package gui;
 
 import gamelogic.*;
+import gamelogic.pieces.Colour;
+import gamelogic.pieces.Coordinates;
+import gamelogic.pieces.King;
+import gamelogic.pieces.Piece;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
@@ -55,8 +59,8 @@ public class BoardController implements Initializable {
         whichColour = GameData.whichColour();
         perspectiveIndicator = whichColour == Colour.WHITE ? 0 : 9;
         game = new Game();
-        blackAI = new CheckersAI(Colour.BLACK, 5, game.getBoard());
-        whiteAI = new CheckersAI(Colour.WHITE, 5, game.getBoard());
+        blackAI = new CheckersAI(Colour.BLACK, 7, game.getBoard());
+        whiteAI = new CheckersAI(Colour.WHITE, 7, game.getBoard());
         showBoard();
         initializeAI();
         if (mode == 2 || (mode == 1 && whichColour == Colour.BLACK)) whiteAIService.restart();
@@ -195,6 +199,11 @@ public class BoardController implements Initializable {
         Tooltip tooltip = new Tooltip("Copied to clipboard!");
         pdnB.setOnAction(event -> {
             try {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent content = new ClipboardContent();
+                content.putString(game.getPDN());
+                clipboard.setContent(content);
+
                 double screenX = pdnB.localToScreen(pdnB.getBoundsInLocal()).getMinX();
                 double screenY = pdnB.localToScreen(pdnB.getBoundsInLocal()).getMinY();
                 tooltip.show(pdnB, screenX, screenY);
@@ -234,11 +243,6 @@ public class BoardController implements Initializable {
                 } catch (IOException e) {
                     System.out.println("Can't play again.");
                 }
-            } else if (buttonType == buttonPDN) {
-                Clipboard clipboard = Clipboard.getSystemClipboard();
-                ClipboardContent content = new ClipboardContent();
-                content.putString(game.getPDN());
-                clipboard.setContent(content);
             }
         });
         return true;

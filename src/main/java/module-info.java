@@ -8,4 +8,6 @@ module com.example.checkers {
 
     opens gamelogic;
     exports gamelogic;
+    exports gamelogic.pieces;
+    opens gamelogic.pieces;
 }

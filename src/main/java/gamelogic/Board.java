@@ -1,6 +1,7 @@
 package gamelogic;
 
-import java.security.Key;
+import gamelogic.pieces.*;
+
 import java.util.*;
 
 public class Board {

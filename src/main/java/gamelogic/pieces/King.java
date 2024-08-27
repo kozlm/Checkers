@@ -1,4 +1,4 @@
-package gamelogic;
+package gamelogic.pieces;
 
 public class King extends Piece{
 

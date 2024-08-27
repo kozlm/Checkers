@@ -1,4 +1,4 @@
-package gamelogic;
+package gamelogic.pieces;
 
 public class Coordinates implements Comparable<Coordinates> {
     public Coordinates(int x, int y) {

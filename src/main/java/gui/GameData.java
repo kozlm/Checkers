@@ -1,6 +1,6 @@
 package gui;
 
-import gamelogic.Colour;
+import gamelogic.pieces.Colour;
 
 public class GameData {
 
