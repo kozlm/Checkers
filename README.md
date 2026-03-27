@@ -53,11 +53,15 @@ download the [PDN][1]  of the game.
 
 ![End](src/main/resources/images/win.png)
 
+<!---
 ## To-Do
 
 - implement SOLID and dependency injection principles
 - add more tests
 - add another checkers modes
 - add another board games (especially chess)
+
+Holy spaghetti
+-->
 
 [1]: https://en.wikipedia.org/wiki/Portable_Draughts_Notation
